@@ -29,7 +29,6 @@ export default function LadderTable({
     <>
       <div className="overflow-x-auto">
         <table className="w-full text-sm border-collapse font-mono tabular-nums">
-          {/* fixed column widths */}
           <colgroup>
             <col className="w-12" />
             <col className="w-44" />
@@ -93,7 +92,6 @@ export default function LadderTable({
         </table>
       </div>
 
-      {/* pagination */}
       <div className="flex items-center justify-center gap-2 pt-4 text-sm">
         {currentPage > 1 && (
           <Link

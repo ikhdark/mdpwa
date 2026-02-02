@@ -16,10 +16,6 @@ const PAGE_SIZE = 50;
    helpers
 ========================= */
 
-function pct(n: number) {
-  return `${(n * 100).toFixed(1)}%`;
-}
-
 function num(n: number | null | undefined, d = 0) {
   if (n == null) return "—";
   return n.toFixed(d);
@@ -40,7 +36,7 @@ export default async function LadderPage({
 
   const rawPage = Number(page) || 1;
 
-  // ✅ service now handles pagination + caching
+  // service handles pagination + caching
   const data = await getPlayerLadder(battletag, rawPage, PAGE_SIZE);
   if (!data) notFound();
 
@@ -73,9 +69,7 @@ export default async function LadderPage({
       <LadderSearch rows={rows} base={base} />
 
       <p className="text-xs text-gray-500 -mt-4">
-        Ranked by <b>Score</b> (performance index) which = MMR, SoS (Strength of
-        Schedule), Winrate. There is also a decay metric applied to inactive
-        players.
+        Ranked by <b>Score</b> (performance index) which = MMR and SoS (Strength of Schedule) and Activity.
       </p>
 
       <p className="text-xs text-gray-500 -mt-2">
@@ -102,7 +96,6 @@ export default async function LadderPage({
                 <th className="text-right w-20">MMR</th>
                 <th className="text-right w-20">SoS</th>
                 <th className="text-right w-16">W-L</th>
-                <th className="text-right w-16">WR</th>
               </tr>
             </thead>
 
@@ -141,10 +134,6 @@ export default async function LadderPage({
 
                     <td className="py-1.5 text-right">
                       {p.wins}-{p.losses}
-                    </td>
-
-                    <td className="py-1.5 text-right">
-                      {pct(p.winrate)}
                     </td>
                   </tr>
                 );
