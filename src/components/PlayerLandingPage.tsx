@@ -101,7 +101,7 @@ export default function PlayerLandingPage() {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: "KD's W3Champions Stats",
+          title: "KD W3Champions Stats",
           url: window.location.href,
         });
         return;
