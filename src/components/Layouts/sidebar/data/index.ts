@@ -27,12 +27,6 @@ export const NAV_DATA = [
         as: "link",
       },
       {
-        title: "Rank Stats",
-        icon: Icons.HomeIcon,
-        path: "/rank",
-        as: "link",
-      },
-      {
         title: "Performance",
         icon: Icons.HomeIcon,
         path: "/performance",
