@@ -64,7 +64,7 @@ export default async function CountriesPage({ params, searchParams }: Props) {
       {/* HEADER */}
       <PlayerHeader
         battletag={canonicalBt}
-        subtitle="Country Stats · Season 24 (Games under 120 seconds excluded)"
+        subtitle="Country Stats (All races) · Season 24 (Games under 120 seconds excluded)"
       />
 
       {/* ================= HOME VS FOREIGN ================= */}

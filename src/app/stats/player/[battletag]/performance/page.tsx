@@ -146,7 +146,7 @@ const underdogLarge  = underdogBuckets.filter((b) => Math.abs(b.min) >= 150);
     <div className="space-y-8">
       <PlayerHeader
         battletag={canonicalBt}
-        subtitle="Performance Stats · Season 24"
+        subtitle="Performance Stats (All Races) · Season 24"
       />
 
       <Section title="Overview">
