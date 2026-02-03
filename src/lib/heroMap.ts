@@ -7,6 +7,7 @@ export const HERO_MAP: Record<string, string> = {
   blademaster: "Blademaster",
   farseer: "Farseer",
   taurenchieftain: "Tauren Chieftain",
+  seawitch: "Naga Sea Witch",
   shadowhunter: "Shadow Hunter",
 
   demonhunter: "Demon Hunter",
