@@ -3,11 +3,9 @@ import {
   getPlayerAndOpponent,
   fetchJson,
 } from "@/lib/w3cUtils";
-
 import { flattenCountryLadder } from "@/lib/ranking";
 import { resolveBattleTagViaSearch } from "@/lib/w3cBattleTagResolver";
 import { hasLifetimeRaceGames } from "@/lib/raceEligibility";
-
 import {
   buildLadder,
   type LadderRow,
@@ -66,7 +64,10 @@ async function fetchAllLeagues(): Promise<any[]> {
 
   for (let league = MIN_LEAGUE; league <= MAX_LEAGUE; league++) {
     urls.push(
-      `https://website-backend.w3champions.com/api/ladder/${league}?gateWay=${GATEWAY}&gameMode=${GAME_MODE}&season=${SEASON}`
+      `https://website-backend.w3champions.com/api/ladder/${league}` +
+        `?gateWay=${GATEWAY}` +
+        `&gameMode=${GAME_MODE}` +
+        `&season=${SEASON}`
     );
   }
 
@@ -77,46 +78,28 @@ async function fetchAllLeagues(): Promise<any[]> {
     })
   );
 
-  return results.flat();
+  return results.flat();   // ← YOU MISSED THIS
 }
 
 /* =========================
-   SHARED MATCH CACHE HELPER
+   SoS
 ========================= */
 
-async function getMatchesCached(
-  battletag: string,
-  cache: Map<string, any[]>
-) {
-  const key = battletag.toLowerCase();
+async function computeSoS(rows: LadderRow[], raceId: number) {
+  // request-scoped cache (safe + faster)
+  const matchCache = new Map<string, any[]>();
 
-  let matches = cache.get(key);
-  if (!matches) {
-    matches = await fetchAllMatches(battletag, [SEASON]);
-    cache.set(key, matches);
-  }
-
-  return matches;
-}
-
-/* =========================
-   SoS (NOW USES SHARED CACHE)
-========================= */
-
-async function computeSoS(
-  rows: LadderRow[],
-  raceId: number,
-  matchCache: Map<string, any[]>
-) {
   for (let i = 0; i < rows.length; i += SOS_CONCURRENCY) {
     const chunk = rows.slice(i, i + SOS_CONCURRENCY);
 
     await Promise.all(
       chunk.map(async (row) => {
-        const matches = await getMatchesCached(
-          row.battletag,
-          matchCache
-        );
+        let matches = matchCache.get(row.battletag);
+
+        if (!matches) {
+          matches = await fetchAllMatches(row.battletag, [SEASON]);
+          matchCache.set(row.battletag, matches);
+        }
 
         let sum = 0;
         let n = 0;
@@ -156,19 +139,15 @@ export async function getPlayerRaceLadder(
   page = 1,
   pageSize = 50
 ): Promise<PlayerRaceLadderResponse | null> {
-
   const battletag = inputBattleTag
-    ? await resolveBattleTagViaSearch(inputBattleTag)
-    : null;
-
+  ? await resolveBattleTagViaSearch(inputBattleTag)
+  : null;
   const raceId = RACE_ID[race];
 
   const payload = await fetchAllLeagues();
   const rows = flattenCountryLadder(payload);
 
-  /* ---------------------------
-     build ladder
-  --------------------------- */
+  /* initial cheap filters */
 
   const inputs: LadderInputRow[] = rows
     .filter(
@@ -188,49 +167,26 @@ export async function getPlayerRaceLadder(
 
   const ladder = buildLadder(inputs);
 
-  /* ---------------------------
-     shared cache (KEY FIX)
-  --------------------------- */
-
-  const matchCache = new Map<string, any[]>();
-
-  /* ---------------------------
-     eligibility (ONLY visible)
-  --------------------------- */
+  /* lifetime eligibility */
 
   const start = (page - 1) * pageSize;
   const end = start + pageSize;
 
-  const visibleSlice = ladder.slice(start, end);
+  const sample = [
+    ...ladder.slice(start, end),
+    ...ladder.slice(0, pageSize),
+  ];
 
-const checks = await Promise.all(
-  visibleSlice.map(async (r) => {
-    const matches = await getMatchesCached(
-      r.battletag,
-      matchCache
-    );
+  const unique = new Map(sample.map((r) => [r.battletag, r]));
 
-    let games = 0;
-
-    for (const m of matches) {
-      if (m.gameMode !== GAME_MODE) continue;
-      if (m.durationInSeconds < 120) continue;
-
-      const pair = getPlayerAndOpponent(m, r.battletag);
-      if (!pair) continue;
-
-      if (raceId !== 0 && pair.me.race !== raceId) continue;
-
-      games++;
-      if (games >= 35) return true; // early exit
-    }
-
-    return false;
-  })
-);
+  const checks = await Promise.all(
+    [...unique.values()].map((r) =>
+      hasLifetimeRaceGames(r.battletag, raceId, 35)
+    )
+  );
 
   const eligibility = new Map<string, boolean>();
-  visibleSlice.forEach((r, i) =>
+  [...unique.values()].forEach((r, i) =>
     eligibility.set(r.battletag, checks[i])
   );
 
@@ -241,33 +197,25 @@ const checks = await Promise.all(
   const visible = eligible.slice(start, end);
   const top = eligible.slice(0, pageSize);
 
-  /* ---------------------------
-     me
-  --------------------------- */
+ let me: LadderRow | null = null;
 
-  let me: LadderRow | null = null;
+if (battletag) {
+  me =
+    eligible.find(
+      (r) =>
+        r.battletag.toLowerCase() === battletag.toLowerCase()
+    ) ?? null;
+}
 
-  if (battletag) {
-    me =
-      eligible.find(
-        (r) =>
-          r.battletag.toLowerCase() === battletag.toLowerCase()
-      ) ?? null;
-  }
+  /* compute SoS only for rows actually rendered */
 
-  /* ---------------------------
-     SoS (reuses SAME cache)
-  --------------------------- */
+const toCompute: LadderRow[] = [
+  ...visible,
+  ...top,
+  ...(me ? [me] : []),
+];
 
-  const toCompute: LadderRow[] = [
-    ...visible,
-    ...top,
-    ...(me ? [me] : []),
-  ];
-
-  await computeSoS(toCompute, raceId, matchCache);
-
-  /* --------------------------- */
+await computeSoS(toCompute, raceId);
 
   return {
     battletag: battletag ?? "",
