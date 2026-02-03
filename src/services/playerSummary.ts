@@ -35,7 +35,6 @@ export async function getPlayerSummary(inputTag: string) {
   const canonicalBattleTag = await resolveBattleTagViaSearch(raw);
   if (!canonicalBattleTag) return null;
 
-  // ✅ single source of truth (already cached in w3cUtils)
   const matches = await fetchAllMatches(canonicalBattleTag, SEASONS);
   if (!matches.length) return null;
 
@@ -45,18 +44,20 @@ export async function getPlayerSummary(inputTag: string) {
 
   const raceGamesAllTime: Record<string, number> = {};
   const raceGamesCurrentSeason: Record<string, number> = {};
+
   const lastPlayedRace: Record<string, Date> = {};
   const raceMMRCurrent: Record<string, number> = {};
+
   const raceCounters: Record<string, number> = {};
   const racePeaks: Record<string, any> = {};
 
   let highestCurrentRace: string | null = null;
+  let lastPlayedLadder: Date | null = null;
+
   let largestGapWin: any = null;
   let largestSingleGain: any = null;
 
   const highGainGames: any[] = [];
-
-  let lastPlayedLadder: Date | null = null;
 
   /* =====================================================
      SINGLE PASS
@@ -75,20 +76,36 @@ export async function getPlayerSummary(inputTag: string) {
 
     const race = resolveEffectiveRace(me);
 
-    /* ----- always stats ----- */
+    /* ---------------- always stats ---------------- */
 
     raceGamesAllTime[race] = (raceGamesAllTime[race] || 0) + 1;
 
+    /* --------- current season MMR (FIXED) --------- */
+
     if (season === CURRENT_SEASON) {
-      raceGamesCurrentSeason[race] = (raceGamesCurrentSeason[race] || 0) + 1;
-      raceMMRCurrent[race] = me.currentMmr;
+      raceGamesCurrentSeason[race] =
+        (raceGamesCurrentSeason[race] || 0) + 1;
+
+      // ONLY update if newer
+      const prevDate = lastPlayedRace[race];
+      if (!prevDate || date > prevDate) {
+        raceMMRCurrent[race] = me.currentMmr;
+      }
     }
 
-    lastPlayedRace[race] = date;
+    /* --------- last played race (FIXED) --------- */
+
+    if (!lastPlayedRace[race] || date > lastPlayedRace[race]) {
+      lastPlayedRace[race] = date;
+    }
+
+    /* --------- last ladder game overall (FIXED) --------- */
 
     if (!lastPlayedLadder || date > lastPlayedLadder) {
       lastPlayedLadder = date;
     }
+
+    /* --------- highest current race (FIXED) --------- */
 
     if (
       !highestCurrentRace ||
@@ -98,7 +115,7 @@ export async function getPlayerSummary(inputTag: string) {
       highestCurrentRace = race;
     }
 
-    /* ----- heavy performance section filters ----- */
+    /* ---------------- heavy performance filters ---------------- */
 
     if (
       match.durationInSeconds < MIN_DURATION_SECONDS ||
@@ -112,6 +129,7 @@ export async function getPlayerSummary(inputTag: string) {
     raceCounters[race] = (raceCounters[race] ?? 0) + 1;
 
     /* peaks */
+
     if (raceCounters[race] > 35 && typeof me.currentMmr === "number") {
       if (!racePeaks[race] || me.currentMmr > racePeaks[race].mmr) {
         racePeaks[race] = {
@@ -124,6 +142,7 @@ export async function getPlayerSummary(inputTag: string) {
     }
 
     /* gains */
+
     if (me.mmrGain >= HIGH_GAIN_THRESHOLD) {
       highGainGames.push({
         gain: me.mmrGain,
