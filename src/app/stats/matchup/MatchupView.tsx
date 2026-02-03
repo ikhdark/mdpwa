@@ -72,7 +72,7 @@ export default function MatchupView({ stats }: { stats: any }) {
       {/* Overview */}
       {/* ========================================= */}
 
-<Section title="Overview">
+<Section title="Overview for the last 2 seasons (Season 22-24)">
   {(() => {
     const RACE_LABEL: Record<string, string> = {
       "0": "Human",
