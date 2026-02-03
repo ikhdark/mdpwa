@@ -1,12 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import WhatsNew from "@/components/WhatsNew";
+
+const RECENT_KEY = "w3c_recent_searches";
+
+/* ================= STORAGE HELPERS ================= */
+
+function readRecent(): string[] {
+  if (typeof window === "undefined") return [];
+
+  try {
+    return JSON.parse(localStorage.getItem(RECENT_KEY) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function writeRecent(tag: string) {
+  try {
+    const prev = readRecent();
+    const next = [tag, ...prev.filter((t) => t !== tag)].slice(0, 3);
+    localStorage.setItem(RECENT_KEY, JSON.stringify(next));
+  } catch {}
+}
 
 function normalizeBattleTagInput(value: string) {
   return value.trim();
 }
+
+/* ================================================== */
 
 export default function PlayerLandingPage() {
   const router = useRouter();
@@ -15,13 +39,22 @@ export default function PlayerLandingPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // ✅ reactive recent list
+  const [recent, setRecent] = useState<string[]>([]);
+
+  // ✅ load once on mount
+  useEffect(() => {
+    setRecent(readRecent());
+  }, []);
+
+  /* ================= SUBMIT ================= */
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (loading) return;
 
     const value = normalizeBattleTagInput(query);
 
-    // block empty input
     if (!value) {
       setError("Enter a BattleTag");
       return;
@@ -41,6 +74,9 @@ export default function PlayerLandingPage() {
 
       if (!data?.battleTag) throw new Error();
 
+      writeRecent(data.battleTag);
+      setRecent(readRecent()); // ✅ update immediately
+
       router.replace(
         `/stats/player/${encodeURIComponent(data.battleTag)}/summary`
       );
@@ -51,6 +87,9 @@ export default function PlayerLandingPage() {
   }
 
   function quickGo(tag: string) {
+    writeRecent(tag);
+    setRecent(readRecent()); // ✅ update immediately
+
     router.replace(`/stats/player/${encodeURIComponent(tag)}/summary`);
   }
 
@@ -68,11 +107,11 @@ export default function PlayerLandingPage() {
     alert("Press Ctrl + D (Cmd + D on Mac) to bookmark this page.");
   }
 
+  /* ================= UI ================= */
+
   return (
     <div className="min-h-dvh bg-gray-50 dark:bg-gray-900 flex justify-center px-6 py-16">
       <div className="w-full max-w-xl space-y-10 text-center">
-
-        {/* ================= HEADER ================= */}
 
         <div className="space-y-2">
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-black dark:text-white">
@@ -84,18 +123,8 @@ export default function PlayerLandingPage() {
           </p>
         </div>
 
-        {/* ================= MAIN CARD ================= */}
+        <div className="space-y-6 rounded-2xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-md p-6">
 
-        <div
-          className="
-            space-y-6
-            rounded-2xl
-            border border-gray-300 dark:border-gray-700
-            bg-white dark:bg-gray-900
-            shadow-md
-            p-6
-          "
-        >
           {/* SEARCH */}
           <form onSubmit={onSubmit} className="space-y-4">
             <input
@@ -106,16 +135,9 @@ export default function PlayerLandingPage() {
               }}
               disabled={loading}
               placeholder="Search any BattleTag (e.g. Moon#1234)"
-              className="
-                w-full rounded-lg
-                border border-gray-300 dark:border-gray-700
-                bg-white dark:bg-gray-950
-                px-5 py-4 text-lg
-                focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500
-              "
+              className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 px-5 py-4 text-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
             />
 
-            {/* moved error here */}
             {error && (
               <p className="text-sm text-rose-500 text-left -mt-2">
                 {error}
@@ -125,16 +147,7 @@ export default function PlayerLandingPage() {
             <button
               type="submit"
               disabled={loading || !query.trim()}
-              className="
-                w-full rounded-lg
-                bg-emerald-500 text-white
-                py-3 text-base font-semibold
-                shadow-sm
-                hover:bg-emerald-600 hover:shadow-md
-                active:scale-[0.99]
-                transition
-                disabled:opacity-50 disabled:cursor-not-allowed
-              "
+              className="w-full rounded-lg bg-emerald-500 text-white py-3 text-base font-semibold shadow-sm hover:bg-emerald-600 hover:shadow-md active:scale-[0.99] transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? "Searching…" : "Search Player"}
             </button>
@@ -144,38 +157,39 @@ export default function PlayerLandingPage() {
           <div className="text-sm text-gray-500 dark:text-gray-400 space-x-3">
             <span>Try:</span>
 
-            <button
-              onClick={() => quickGo("Grubby#1278")}
-              className="underline hover:text-black dark:hover:text-white"
-            >
+            <button onClick={() => quickGo("Grubby#1278")} className="underline hover:text-black dark:hover:text-white">
               Grubby#1278
             </button>
 
-            <button
-              onClick={() => quickGo("KAHO#31819")}
-              className="underline hover:text-black dark:hover:text-white"
-            >
+            <button onClick={() => quickGo("KAHO#31819")} className="underline hover:text-black dark:hover:text-white">
               KAHO#31819
             </button>
 
-            <button
-              onClick={() => quickGo("StarBuck#2732")}
-              className="underline hover:text-black dark:hover:text-white"
-            >
+            <button onClick={() => quickGo("StarBuck#2732")} className="underline hover:text-black dark:hover:text-white">
               StarBuck#2732
             </button>
           </div>
 
+          {/* LAST 3 SEARCHED */}
+          {recent.length > 0 && (
+            <div className="text-sm text-gray-500 dark:text-gray-400 space-x-3">
+              <span>Last 3 Battletags Searched:</span>
+              {recent.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => quickGo(tag)}
+                  className="underline hover:text-black dark:hover:text-white"
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          )}
+
           {/* BOOKMARK */}
           <button
             onClick={bookmark}
-            className="
-              mx-auto flex items-center justify-center gap-2
-              text-sm font-medium
-              text-amber-600 dark:text-amber-400
-              hover:text-amber-700 dark:hover:text-amber-300
-              transition
-            "
+            className="mx-auto flex items-center justify-center gap-2 text-sm font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition"
           >
             ⭐ Bookmark W3CStats
           </button>
