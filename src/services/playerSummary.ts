@@ -11,31 +11,6 @@ const MIN_DURATION_SECONDS = 120;
 const MAX_EXTREME_ABS_MMR_CHANGE = 30;
 const HIGH_GAIN_THRESHOLD = 15;
 
-/* -------------------- MATCH CACHE -------------------- */
-
-const MATCH_CACHE_TTL = 5 * 60 * 1000;
-
-const matchCache = new Map<
-  string,
-  { time: number; matches: any[] }
->();
-
-async function fetchMatchesCached(tag: string) {
-  const key = `${tag.toLowerCase()}|${SEASONS.join(",")}`;
-  const now = Date.now();
-
-  const cached = matchCache.get(key);
-  if (cached && now - cached.time < MATCH_CACHE_TTL) {
-    return cached.matches;
-  }
-
-  const matches = await fetchAllMatches(tag, SEASONS);
-
-  matchCache.set(key, { time: now, matches });
-
-  return matches;
-}
-
 /* -------------------- PAIRING (CI) -------------------- */
 
 function getPlayerAndOpponentCI(match: any, lower: string) {
@@ -60,7 +35,8 @@ export async function getPlayerSummary(inputTag: string) {
   const canonicalBattleTag = await resolveBattleTagViaSearch(raw);
   if (!canonicalBattleTag) return null;
 
-  const matches = await fetchMatchesCached(canonicalBattleTag);
+  // ✅ single source of truth (already cached in w3cUtils)
+  const matches = await fetchAllMatches(canonicalBattleTag, SEASONS);
   if (!matches.length) return null;
 
   const lower = canonicalBattleTag.toLowerCase();
@@ -109,8 +85,10 @@ export async function getPlayerSummary(inputTag: string) {
     }
 
     lastPlayedRace[race] = date;
-    if (!lastPlayedLadder || date > lastPlayedLadder)
-  lastPlayedLadder = date;
+
+    if (!lastPlayedLadder || date > lastPlayedLadder) {
+      lastPlayedLadder = date;
+    }
 
     if (
       !highestCurrentRace ||
@@ -134,10 +112,7 @@ export async function getPlayerSummary(inputTag: string) {
     raceCounters[race] = (raceCounters[race] ?? 0) + 1;
 
     /* peaks */
-    if (
-      raceCounters[race] > 35 &&
-      typeof me.currentMmr === "number"
-    ) {
+    if (raceCounters[race] > 35 && typeof me.currentMmr === "number") {
       if (!racePeaks[race] || me.currentMmr > racePeaks[race].mmr) {
         racePeaks[race] = {
           race,
@@ -171,20 +146,20 @@ export async function getPlayerSummary(inputTag: string) {
       };
     }
 
-const gap = Math.abs(me.oldMmr - opp.oldMmr);
+    const gap = Math.abs(me.oldMmr - opp.oldMmr);
 
-if (me.won && me.oldMmr < opp.oldMmr) {
-  if (!largestGapWin || gap > largestGapWin.gap) {
-    largestGapWin = {
-      gap,
-      myRace: race,
-      myMMR: me.oldMmr,
-      oppName: opp.battleTag,
-      oppRace: resolveEffectiveRace(opp),
-      oppMMR: opp.oldMmr,
-    };
-  }
-}
+    if (me.won && me.oldMmr < opp.oldMmr) {
+      if (!largestGapWin || gap > largestGapWin.gap) {
+        largestGapWin = {
+          gap,
+          myRace: race,
+          myMMR: me.oldMmr,
+          oppName: opp.battleTag,
+          oppRace: resolveEffectiveRace(opp),
+          oppMMR: opp.oldMmr,
+        };
+      }
+    }
   }
 
   /* ---------- results ---------- */

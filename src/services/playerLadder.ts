@@ -1,4 +1,9 @@
-import { fetchAllMatches, getPlayerAndOpponent } from "@/lib/w3cUtils";
+import {
+  fetchAllMatches,
+  getPlayerAndOpponent,
+  fetchJson,
+} from "@/lib/w3cUtils";
+
 import { flattenCountryLadder } from "@/lib/ranking";
 import { resolveBattleTagViaSearch } from "@/lib/w3cBattleTagResolver";
 
@@ -7,7 +12,6 @@ import {
   type LadderRow,
   type LadderInputRow,
 } from "@/lib/ladderEngine";
-
 /* =========================
    CONFIG
 ========================= */
@@ -53,14 +57,13 @@ async function fetchAllLeagues(): Promise<any[]> {
   }
 
   const results = await Promise.all(
-    urls.map((url) =>
-      fetch(url)
-        .then((r) => (r.ok ? r.json() : []))
-        .catch(() => [])
-    )
+    urls.map(async (url) => {
+      const json = await fetchJson<any[]>(url);
+      return json ?? [];
+    })
   );
 
-  return results.flat();
+  return results.flat();   // ← YOU MISSED THIS
 }
 
 /* =========================
@@ -68,12 +71,22 @@ async function fetchAllLeagues(): Promise<any[]> {
 ========================= */
 
 async function computeSoS(rows: LadderRow[]) {
+  // request-scoped cache → prevents duplicate fetchAllMatches calls
+  const matchCache = new Map<string, any[]>();
+
   for (let i = 0; i < rows.length; i += SOS_CONCURRENCY) {
     const chunk = rows.slice(i, i + SOS_CONCURRENCY);
 
     await Promise.all(
       chunk.map(async (row) => {
-        const matches = await fetchAllMatches(row.battletag, [SEASON]);
+        const key = row.battletag.toLowerCase();
+
+        let matches = matchCache.get(key);
+
+        if (!matches) {
+          matches = await fetchAllMatches(row.battletag, [SEASON]);
+          matchCache.set(key, matches);
+        }
 
         let sum = 0;
         let n = 0;

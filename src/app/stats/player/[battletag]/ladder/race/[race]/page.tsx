@@ -43,7 +43,11 @@ export default async function RaceLadderPage({
   if (!battletag || !raceParam) notFound();
 
   const race = raceParam.toLowerCase() as Race;
-  const rawPage = Number(page) || 1;
+
+if (!["human","orc","elf","undead","random"].includes(race)) {
+  notFound();
+}
+  const rawPage = Math.max(1, Number(page) || 1);
 
   // service handles caching + pagination
   const data = await getPlayerRaceLadder(

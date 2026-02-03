@@ -184,9 +184,7 @@ const canonicalTag =
   let homeCountry = resolveCountryFromProfile(profile);
 
 // matches: try canonical first, then lowercase fallback (some endpoints behave that way)
-const matches = normalizeMatches(
-  await fetchAllMatches(canonicalTag, SEASONS)
-);
+const matches = await fetchAllMatches(canonicalTag, SEASONS);
 
 
 // TEMP: do NOT early-return

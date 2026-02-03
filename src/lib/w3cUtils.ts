@@ -1,10 +1,11 @@
 // src/lib/w3cUtils.ts
-// Next.js-friendly (no axios). Keep canonical resolver single-source-of-truth.
+// Central W3C network + match utilities
+// SINGLE fetch layer (dedup + no-store)
 
 import { resolveBattleTagViaSearch } from "@/lib/w3cBattleTagResolver";
 
 /* =====================================================
-   FETCH
+   FETCH (SINGLE SOURCE OF TRUTH)
 ===================================================== */
 
 const fetchFn: typeof fetch =
@@ -12,9 +13,41 @@ const fetchFn: typeof fetch =
     ? globalThis.fetch.bind(globalThis)
     : fetch;
 
-async function fetchJson<T = any>(url: string): Promise<T | null> {
+const inFlightRequests = new Map<string, Promise<Response>>();
+
+function requestKey(url: string, init?: RequestInit) {
+  return `${(init?.method ?? "GET").toUpperCase()}:${url}`;
+}
+
+export async function fetchWithDedup(
+  url: string,
+  init?: RequestInit
+): Promise<Response> {
+  const key = requestKey(url, init);
+
+  let request = inFlightRequests.get(key);
+
+  if (!request) {
+    request = fetchFn(url, { cache: "no-store", ...init });
+    inFlightRequests.set(key, request);
+  }
+
   try {
-    const res = await fetchFn(url, { cache: "no-store" });
+    const res = await request;
+    return res.clone();
+  } finally {
+    if (inFlightRequests.get(key) === request) {
+      inFlightRequests.delete(key);
+    }
+  }
+}
+
+export async function fetchJson<T = any>(
+  url: string,
+  init?: RequestInit
+): Promise<T | null> {
+  try {
+    const res = await fetchWithDedup(url, init);
     if (!res.ok) return null;
     return (await res.json()) as T;
   } catch {
@@ -64,16 +97,12 @@ export async function resolveCanonicalBattleTag(
    MATCH FETCH (CACHED + BATCHED PARALLEL)
 ===================================================== */
 
-/* ---------- cache ---------- */
-
-const MATCH_CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+const MATCH_CACHE_TTL = 10 * 60 * 1000;
 
 const matchCache = new Map<
   string,
   { ts: number; data: any[] }
 >();
-
-/* ---------- helpers ---------- */
 
 function normalizeMatches(payload: any): any[] {
   if (Array.isArray(payload)) return payload;
@@ -83,19 +112,15 @@ function normalizeMatches(payload: any): any[] {
   return [];
 }
 
-/* ---------- season fetch (bounded concurrency) ---------- */
-
 async function fetchSeasonMatches(
   encodedTag: string,
   season: number
 ): Promise<any[]> {
-
   const all: any[] = [];
 
   let offset = 0;
   let done = false;
 
-  // SAFE CONCURRENCY LIMIT
   const BATCH_SIZE = 10;
 
   while (!done) {
@@ -142,19 +167,15 @@ async function fetchSeasonMatches(
   return all;
 }
 
-/* ---------- public ---------- */
-
 export async function fetchAllMatches(
   canonicalBattleTag: string,
   seasons: number[] = [23]
 ): Promise<any[]> {
-
   if (!canonicalBattleTag) return [];
 
   const key = `${canonicalBattleTag.toLowerCase()}-${seasons.join(",")}`;
   const now = Date.now();
 
-  /* cache hit */
   const cached = matchCache.get(key);
   if (cached && now - cached.ts < MATCH_CACHE_TTL) {
     return cached.data;
@@ -162,14 +183,12 @@ export async function fetchAllMatches(
 
   const encodedTag = encodeURIComponent(canonicalBattleTag);
 
-  /* parallel seasons */
   const seasonResults = await Promise.all(
     seasons.map((s) => fetchSeasonMatches(encodedTag, s))
   );
 
   const allMatches = seasonResults.flat();
 
-  /* cache store */
   matchCache.set(key, {
     ts: now,
     data: allMatches,
@@ -179,8 +198,7 @@ export async function fetchAllMatches(
 }
 
 /* =====================================================
-   TEAM RESOLUTION (TEAM MODES ONLY)
-   Safe for 2v2 / 3v3 / 4v4
+   TEAM + PLAYER RESOLUTION
 ===================================================== */
 
 export function getPlayerTeam(
@@ -195,8 +213,7 @@ export function getPlayerTeam(
     const players = Array.isArray(team?.players) ? team.players : [];
 
     const me = players.find(
-      (p: any) =>
-        String(p?.battleTag ?? "").toLowerCase() === lower
+      (p: any) => String(p?.battleTag ?? "").toLowerCase() === lower
     );
 
     if (me) {
@@ -208,27 +225,20 @@ export function getPlayerTeam(
   return null;
 }
 
-
-
-/* =====================================================
-   PLAYER PAIR RESOLUTION
-===================================================== */
-
 export function getPlayerAndOpponent(
   match: any,
   canonicalBattleTag: string
 ): { me: any; opp: any } | null {
-
   if (!match || !Array.isArray(match?.teams)) return null;
 
   const players: any[] = match.teams.flatMap((t: any) =>
     Array.isArray(t?.players) ? t.players : []
   );
 
-  const targetLower = canonicalBattleTag.toLowerCase();
+  const lower = canonicalBattleTag.toLowerCase();
 
   const me = players.find(
-    (p) => String(p?.battleTag ?? "").toLowerCase() === targetLower
+    (p) => String(p?.battleTag ?? "").toLowerCase() === lower
   );
   if (!me) return null;
 

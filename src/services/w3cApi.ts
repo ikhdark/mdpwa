@@ -1,21 +1,18 @@
 // src/services/w3cApi.ts
-// Next.js-friendly ESM/TypeScript (no Discord logic)
+// Next.js-friendly ESM/TypeScript (network layer only)
 
-const fetchFn: typeof fetch =
-  typeof globalThis !== "undefined" && typeof globalThis.fetch === "function"
-    ? globalThis.fetch.bind(globalThis)
-    : fetch;
+import { fetchJson } from "@/lib/w3cUtils";
 
 /* =========================
    TYPES
 ========================= */
 
 export type PlayerProfile = {
-  battletag: string;           // canonical casing (best effort)
+  battletag: string; // canonical casing (best effort)
   playerId: string | null;
   countryCode: string | null;
   location: string | null;
-  playerAkaCountry: string | null; // e.g. "us"
+  playerAkaCountry: string | null;
 };
 
 export type CountryLadderPayload = unknown[];
@@ -32,13 +29,9 @@ function pickString(x: any): string | null {
    PROFILE
 ========================= */
 
-/**
- * Fetches W3C player profile by BattleTag.
- * IMPORTANT:
- * - battletag MUST already be canonical (from resolveBattleTagViaSearch)
- * - NO casing/identity logic here
- */
-export async function fetchPlayerProfile(battletag: string): Promise<PlayerProfile> {
+export async function fetchPlayerProfile(
+  battletag: string
+): Promise<PlayerProfile> {
   const safeDefault: PlayerProfile = {
     battletag,
     playerId: null,
@@ -51,17 +44,14 @@ export async function fetchPlayerProfile(battletag: string): Promise<PlayerProfi
 
   const btEnc = encodeURIComponent(battletag);
 
-  // 1) Prefer the richer players endpoint
+  /* ---------- primary endpoint ---------- */
+
   try {
-    const res = await fetchFn(
-      `https://website-backend.w3champions.com/api/players/${btEnc}`,
-      { cache: "no-store" }
+    const json = await fetchJson<any>(
+      `https://website-backend.w3champions.com/api/players/${btEnc}`
     );
 
-    if (res.ok) {
-      const json: any = await res.json();
-
-      // Some payloads use battleTag, others battleTag; also id is often battletag
+    if (json) {
       const canonical =
         pickString(json?.battleTag) ||
         pickString(json?.battletag) ||
@@ -80,16 +70,14 @@ export async function fetchPlayerProfile(battletag: string): Promise<PlayerProfi
     console.warn("players endpoint failed, falling back:", e);
   }
 
-  // 2) Fallback to personal-settings (older endpoint)
+  /* ---------- fallback endpoint ---------- */
+
   try {
-    const res = await fetchFn(
-      `https://website-backend.w3champions.com/api/personal-settings/${btEnc}`,
-      { cache: "no-store" }
+    const json = await fetchJson<any>(
+      `https://website-backend.w3champions.com/api/personal-settings/${btEnc}`
     );
 
-    if (!res.ok) return safeDefault;
-
-    const json: any = await res.json();
+    if (!json) return safeDefault;
 
     return {
       battletag,
@@ -108,14 +96,6 @@ export async function fetchPlayerProfile(battletag: string): Promise<PlayerProfi
    COUNTRY LADDER
 ========================= */
 
-/**
- * Fetches the country-specific ladder data.
- * Returns an empty array if API fails.
- *
- * IMPORTANT:
- * - country should already be normalized (usually upper-case)
- * - NO identity logic here
- */
 export async function fetchCountryLadder(
   country: string,
   gateway: number,
@@ -130,14 +110,7 @@ export async function fetchCountryLadder(
     )}?gateWay=${gateway}&gameMode=${gameMode}&season=${season}`;
 
   try {
-    const res = await fetchFn(url, { cache: "no-store" });
-
-    if (!res.ok) {
-      console.warn(`⚠️ Country ladder not found: ${country}`);
-      return [];
-    }
-
-    const json = (await res.json()) as unknown;
+    const json = await fetchJson<unknown[]>(url);
     return Array.isArray(json) ? json : [];
   } catch (err) {
     console.error(`❌ Error fetching country ladder (${country}):`, err);

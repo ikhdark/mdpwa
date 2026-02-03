@@ -7,7 +7,10 @@ import {
 import { hasLifetimeRaceGames } from "@/lib/raceEligibility";
 import { resolveBattleTagViaSearch } from "@/lib/w3cBattleTagResolver";
 import { flattenCountryLadder, rankByMMR } from "@/lib/ranking";
-import { fetchAllMatches } from "@/lib/w3cUtils";
+import {
+  fetchAllMatches,
+  fetchJson,
+} from "@/lib/w3cUtils";
 
 /* =========================
    CONFIG
@@ -55,9 +58,6 @@ export type W3CRankResponse = {
   ranks: RankRow[];
 };
 
-/* =========================
-   GLOBAL CACHE
-========================= */
 
 let cachedRowsByPage: Map<number, any[]> | null = null;
 let lastFetchTime = 0;
@@ -77,9 +77,7 @@ async function fetchGlobalRowsByPage(): Promise<Map<number, any[]>> {
       `?gateWay=${GATEWAY}&gameMode=${GAMEMODE}&season=${SEASON}`;
 
     requests.push(
-      fetch(url)
-        .then((r) => (r.ok ? r.json() : []))
-        .catch(() => [])
+      fetchJson<any[]>(url).then((json) => json ?? [])
     );
   }
 

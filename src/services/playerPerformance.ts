@@ -12,15 +12,6 @@ const BUCKET_SIZE = 50;
 const MAX_BUCKET_EDGE = 300;
 const EVEN_THRESHOLD = 25;
 
-/* ---------- cache ---------- */
-
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
-
-const cache = new Map<
-  string,
-  { ts: number; data: PlayerPerformanceStats | null }
->();
-
 /* =========================
    TYPES
 ========================= */
@@ -71,7 +62,7 @@ function bucketFloor(diff: number) {
 }
 
 /* =========================
-   SERVICE (single function)
+   SERVICE
 ========================= */
 
 export async function getPlayerPerformance(
@@ -82,19 +73,9 @@ export async function getPlayerPerformance(
   const battletag = await resolveBattleTagViaSearch(inputBattleTag);
   if (!battletag) return null;
 
-  const key = battletag.toLowerCase();
-  const now = Date.now();
-
-  /* cache hit */
-  const cached = cache.get(key);
-  if (cached && now - cached.ts < CACHE_TTL) {
-    return cached.data;
-  }
-
-  /* fetch matches AFTER cache miss */
+  /* fetch (already cached inside w3cUtils) */
   const matches = await fetchAllMatches(battletag, SEASONS);
   if (!matches?.length) return null;
-
 
   /* ---------- compute ---------- */
 
@@ -109,7 +90,7 @@ export async function getPlayerPerformance(
 
   for (const match of matches) {
     if (match.durationInSeconds < MIN_DURATION_SECONDS) continue;
-     if (match.gameMode !== 1) continue;   // ← ADD THIS
+    if (match.gameMode !== 1) continue;
     if (!match.teams || match.teams.length !== 2) continue;
 
     const [teamA, teamB] = match.teams;
@@ -130,8 +111,7 @@ export async function getPlayerPerformance(
 
     const opp = me === pA ? pB : pA;
 
-   if (typeof me.oldMmr !== "number" || typeof opp.oldMmr !== "number") continue;
-
+    if (typeof me.oldMmr !== "number" || typeof opp.oldMmr !== "number") continue;
 
     const diff = me.oldMmr - opp.oldMmr;
     const didWin = !!me.won;
@@ -184,7 +164,7 @@ export async function getPlayerPerformance(
       winrate: b.games ? b.wins / b.games : 0,
     }));
 
-  const result: PlayerPerformanceStats = {
+  return {
     battletag,
     overall,
     higherMMR: higher,
@@ -192,10 +172,4 @@ export async function getPlayerPerformance(
     evenMMR: even,
     buckets,
   };
-
-  /* ---------- cache store ---------- */
-
-  cache.set(key, { ts: now, data: result });
-
-  return result;
 }

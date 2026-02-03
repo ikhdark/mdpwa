@@ -10,14 +10,7 @@ import { fetchAllMatches, getPlayerAndOpponent } from "@/lib/w3cUtils";
 const SESSION_GAP_MS = 30 * 60 * 1000;
 const MIN_DURATION_SECONDS = 120;
 const SEASON = 24;
-/* ---------- match cache ---------- */
 
-const MATCH_TTL = 5 * 60 * 1000;
-
-const matchCache = new Map<
-  string,
-  { ts: number; matches: any[] }
->();
 /* =========================
    HELPERS
 ========================= */
@@ -38,25 +31,10 @@ export async function getPlayerConsistency(input: string) {
   );
   if (!battletag) return null;
 
-  const lower = battletag.toLowerCase();
+  /* ---------- fetch (NO LOCAL CACHE) ---------- */
 
-  /* ---------- fetch ---------- */
-
-  const key = battletag.toLowerCase();
-const now = Date.now();
-
-let allMatches: any[];
-
-const cached = matchCache.get(key);
-
-if (cached && now - cached.ts < MATCH_TTL) {
-  allMatches = cached.matches;
-} else {
-  allMatches = await fetchAllMatches(battletag, [SEASON]);
-  matchCache.set(key, { ts: now, matches: allMatches });
-}
-
-if (!allMatches.length) return null;
+  const allMatches = await fetchAllMatches(battletag, [SEASON]);
+  if (!allMatches.length) return null;
 
   /* ---------- pre-filter FIRST (faster) ---------- */
 
@@ -100,13 +78,11 @@ if (!allMatches.length) return null;
   /* ---------- single pass ---------- */
 
   for (const m of matches) {
-    // ✅ FIX: pass real battletag, NOT lowercase
     const pair = getPlayerAndOpponent(m, battletag);
     if (!pair) continue;
 
     const didWin = !!pair.me?.won;
 
-    /* raw match for heatmap */
     simpleMatches.push({
       startTime: m.startTime,
       didWin,
