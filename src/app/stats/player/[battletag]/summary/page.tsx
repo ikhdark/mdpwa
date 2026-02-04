@@ -225,7 +225,7 @@ if (!battletag) {
             )}
           </Section>
 
-          <Section title="Largest MMR Gains">
+          <Section title="Largest MMR Gains in the Last 3 Seasons">
             {s.gainGamesToShow.length ? (
               s.gainGamesToShow.map((g, i) => (
                 <div key={i} className="grid grid-cols-[1fr_auto] gap-x-3 rounded border p-2 text-sm tabular-nums">
@@ -241,7 +241,7 @@ if (!battletag) {
             )}
           </Section>
 
-          <Section title="Largest MMR Gap Win">
+          <Section title="Largest MMR Gap Win in the Last 3 Seasons">
             {s.largestGapWin ? (
               <div className="grid grid-cols-[1fr_auto] gap-x-3 rounded border p-3 text-sm tabular-nums">
                 <span>
