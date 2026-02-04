@@ -45,6 +45,20 @@ export default function PlayerLandingPage() {
   /* ✅ shared autocomplete hook */
   const { results, clear } = useBattleTagAutocomplete(query);
 
+  /* ================= PWA INSTALL SUPPORT ================= */
+
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+
+  useEffect(() => {
+    function handler(e: any) {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    }
+
+    window.addEventListener("beforeinstallprompt", handler);
+    return () => window.removeEventListener("beforeinstallprompt", handler);
+  }, []);
+
   /* ================= INIT ================= */
 
   useEffect(() => {
@@ -97,18 +111,25 @@ export default function PlayerLandingPage() {
     router.replace(`/stats/player/${encodeURIComponent(tag)}/summary`);
   }
 
+  /* ================= BOOKMARK / INSTALL ================= */
+
   async function bookmark() {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: "KD W3Champions Stats",
-          url: window.location.href,
-        });
-        return;
-      } catch {}
+    /* real install button if supported */
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+      setDeferredPrompt(null);
+      return;
     }
 
-    alert("Press Ctrl + D (Cmd + D on Mac) to bookmark this page.");
+    /* desktop fallback */
+    const isMac = navigator.platform.toUpperCase().includes("MAC");
+
+    alert(
+      isMac
+        ? "Press ⌘ + D to bookmark this page."
+        : "Press Ctrl + D to bookmark this page."
+    );
   }
 
   /* ================= UI ================= */
@@ -196,7 +217,7 @@ export default function PlayerLandingPage() {
             onClick={bookmark}
             className="mx-auto flex items-center justify-center gap-2 text-sm font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition"
           >
-            ⭐ Bookmark W3CStats
+            ⭐ Install / Bookmark W3CStats
           </button>
         </div>
 
