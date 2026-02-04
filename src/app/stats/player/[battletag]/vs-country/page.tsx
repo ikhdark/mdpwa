@@ -61,7 +61,8 @@ export default async function CountriesPage({ params, searchParams }: Props) {
   /* ================= render ================= */
 
   return (
-    <div className="space-y-10 max-w-6xl mx-auto text-sm leading-relaxed">
+    <div className="space-y-8 max-w-6xl mx-auto text-xs md:text-sm leading-relaxed px-3 md:px-0">
+
 
       {/* HEADER */}
       <PlayerHeader
@@ -113,15 +114,15 @@ export default async function CountriesPage({ params, searchParams }: Props) {
       {/* ================= RECORD VS COUNTRIES ================= */}
       <Section title="Record vs Countries">
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-sm">
+          <table className="w-full border-collapse text-xs md:text-sm">
             <thead>
               <tr className="border-b text-left text-gray-500 uppercase text-xs">
-                <th className="px-4 py-2">Country</th>
-                <th className="px-4 py-2 tabular-nums">Games</th>
-                <th className="px-4 py-2 tabular-nums">Opponents</th>
-                <th className="px-4 py-2 tabular-nums">W</th>
-                <th className="px-4 py-2 tabular-nums">L</th>
-                <th className="px-4 py-2 tabular-nums">WR %</th>
+                <th className="px-2 md:px-4 py-2">Country</th>
+                <th className="px-2 md:px-4 py-2 tabular-nums">Games</th>
+                <th className="px-2 md:px-4 py-2 tabular-nums">Opponents</th>
+                <th className="px-2 md:px-4 py-2 tabular-nums">W</th>
+                <th className="px-2 md:px-4 py-2 tabular-nums">L</th>
+                <th className="px-2 md:px-4 py-2 tabular-nums">WR %</th>
               </tr>
             </thead>
 
@@ -131,12 +132,12 @@ export default async function CountriesPage({ params, searchParams }: Props) {
 
                 return (
                   <tr key={c.country} className="border-b">
-                    <td className="px-4 py-2">{c.label}</td>
-                    <td className="px-4 py-2 tabular-nums">{c.games}</td>
-                    <td className="px-4 py-2 tabular-nums">{c.uniqueOpponents}</td>
-                    <td className="px-4 py-2 tabular-nums text-emerald-600">{c.wins}</td>
-                    <td className="px-4 py-2 tabular-nums text-rose-600">{c.losses}</td>
-                    <td className={`px-4 py-2 tabular-nums ${wrColor(wrPercent)}`}>
+                    <td className="px-2 md:px-4 py-2">{c.label}</td>
+                    <td className="px-2 md:px-4 py-2 tabular-nums">{c.games}</td>
+                    <td className="px-2 md:px-4 py-2 tabular-nums">{c.uniqueOpponents}</td>
+                    <td className="px-2 md:px-4 py-2 tabular-nums text-emerald-600">{c.wins}</td>
+                    <td className="px-2 md:px-4 py-2 tabular-nums text-rose-600">{c.losses}</td>
+                    <td className={`px-2 md:px-4 py-2 tabular-nums ${wrColor(wrPercent)}`}>
                       {wrPercent.toFixed(1)}%
                     </td>
                   </tr>
@@ -153,12 +154,12 @@ export default async function CountriesPage({ params, searchParams }: Props) {
           <table className="w-full border-collapse text-sm">
             <thead>
               <tr className="border-b text-left text-gray-500 uppercase text-xs">
-                <th className="px-4 py-2">Country</th>
-                <th className="px-4 py-2">Race</th>
-                <th className="px-4 py-2 tabular-nums">Games</th>
-                <th className="px-4 py-2 tabular-nums">W</th>
-                <th className="px-4 py-2 tabular-nums">L</th>
-                <th className="px-4 py-2 tabular-nums">WR %</th>
+                <th className="px-2 md:px-4 py-2">Country</th>
+                <th className="px-2 md:px-4 py-2">Race</th>
+                <th className="px-2 md:px-4 py-2 tabular-nums">Games</th>
+                <th className="px-2 md:px-4 py-2 tabular-nums">W</th>
+                <th className="px-2 md:px-4 py-2 tabular-nums">L</th>
+                <th className="px-2 md:px-4 py-2 tabular-nums">WR %</th>
               </tr>
             </thead>
 
@@ -171,12 +172,12 @@ export default async function CountriesPage({ params, searchParams }: Props) {
 
                     return (
                       <tr key={`${c.country}-${r.raceId}`} className="border-b">
-                        <td className="px-4 py-2">{idx === 0 ? c.label : ""}</td>
-                        <td className="px-4 py-2">{r.race}</td>
-                        <td className="px-4 py-2 tabular-nums">{r.games}</td>
-                        <td className="px-4 py-2 tabular-nums text-emerald-600">{r.wins}</td>
-                        <td className="px-4 py-2 tabular-nums text-rose-600">{r.losses}</td>
-                        <td className={`px-4 py-2 tabular-nums ${wrColor(wrPercent)}`}>
+                        <td className="px-2 md:px-4 py-2">{idx === 0 ? c.label : ""}</td>
+                        <td className="px-2 md:px-4 py-2">{r.race}</td>
+                        <td className="px-2 md:px-4 py-2 tabular-nums">{r.games}</td>
+                        <td className="px-2 md:px-4 py-2 tabular-nums text-emerald-600">{r.wins}</td>
+                        <td className="px-2 md:px-4 py-2 tabular-nums text-rose-600">{r.losses}</td>
+                        <td className={`px-2 md:px-4 py-2 tabular-nums ${wrColor(wrPercent)}`}>
                           {wrPercent.toFixed(1)}%
                         </td>
                       </tr>
@@ -194,9 +195,9 @@ export default async function CountriesPage({ params, searchParams }: Props) {
           <table className="w-full border-collapse text-sm">
             <thead>
               <tr className="border-b text-left text-gray-500 uppercase text-xs">
-                <th className="px-4 py-2">Country</th>
-                <th className="px-4 py-2 tabular-nums">Avg (min)</th>
-                <th className="px-4 py-2 tabular-nums">Total (h)</th>
+                <th className="px-2 md:px-4 py-2">Country</th>
+                <th className="px-2 md:px-4 py-2 tabular-nums">Avg (min)</th>
+                <th className="px-2 md:px-4 py-2 tabular-nums">Total (h)</th>
                 
               </tr>
             </thead>
@@ -211,13 +212,13 @@ export default async function CountriesPage({ params, searchParams }: Props) {
 
                 return (
                   <tr key={c.country} className="border-b">
-                    <td className="px-4 py-2">{c.label}</td>
+                    <td className="px-2 md:px-4 py-2">{c.label}</td>
 
-                    <td className="px-4 py-2 tabular-nums">
+                    <td className="px-2 md:px-4 py-2 tabular-nums">
                       {avgMin ? avgMin.toFixed(1) : "—"}
                     </td>
 
-                    <td className="px-4 py-2 tabular-nums">
+                    <td className="px-2 md:px-4 py-2 tabular-nums">
                       {hours.toFixed(1)}
                   
                     </td>
@@ -235,17 +236,17 @@ export default async function CountriesPage({ params, searchParams }: Props) {
           <table className="w-full border-collapse text-sm">
             <thead>
               <tr className="border-b text-left text-gray-500 uppercase text-xs">
-                <th className="px-4 py-2">Country</th>
-                <th className="px-4 py-2 tabular-nums">Opp MMR</th>
-                <th className="px-4 py-2 tabular-nums">Your MMR</th>
+                <th className="px-2 md:px-4 py-2">Country</th>
+                <th className="px-2 md:px-4 py-2 tabular-nums">Opp MMR</th>
+                <th className="px-2 md:px-4 py-2 tabular-nums">Your MMR</th>
               </tr>
             </thead>
             <tbody>
               {countriesByOppMmr.map((c) => (
                 <tr key={c.country} className="border-b">
-                  <td className="px-4 py-2">{c.label}</td>
-                  <td className="px-4 py-2 tabular-nums">{c.avgOpponentMMR?.toFixed(0) ?? "—"}</td>
-                  <td className="px-4 py-2 tabular-nums">{c.avgSelfMMR?.toFixed(0) ?? "—"}</td>
+                  <td className="px-2 md:px-4 py-2">{c.label}</td>
+                  <td className="px-2 md:px-4 py-2 tabular-nums">{c.avgOpponentMMR?.toFixed(0) ?? "—"}</td>
+                  <td className="px-2 md:px-4 py-2 tabular-nums">{c.avgSelfMMR?.toFixed(0) ?? "—"}</td>
                 </tr>
               ))}
             </tbody>

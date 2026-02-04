@@ -89,7 +89,7 @@ if (!battletag) {
   ===================================================== */
 
   return (
-    <div className="space-y-12 max-w-6xl mx-auto text-sm">
+   <div className="space-y-8 max-w-6xl mx-auto text-xs md:text-sm px-3 md:px-0">
 
       <PlayerHeader
         battletag={rankData?.battletag ?? s?.battletag ?? decoded}
@@ -135,15 +135,15 @@ if (!battletag) {
 
     <Section title="SoS Ladder Race Rankings">
       <div className="rounded-xl border bg-white shadow-sm dark:bg-gray-dark overflow-x-auto">
-        <table className="min-w-[620px] w-full table-fixed">
+        <table className="w-full table-fixed text-xs md:text-sm">
 
           <thead className="bg-gray-100 dark:bg-gray-800 text-xs uppercase">
             <tr>
-              <th className="px-4 py-3 text-left">Race</th>
-              <th className="px-4 py-3 text-right">Global</th>
-              <th className="px-4 py-3 text-right">Country</th>
-              <th className="px-4 py-3 text-right">MMR</th>
-              <th className="px-4 py-3 text-right">Games</th>
+              <th className="px-2 md:px-4 py-3 text-left">Race</th>
+              <th className="px-2 md:px-4 py-3 text-right">Global</th>
+              <th className="px-2 md:px-4 py-3 text-right">Country</th>
+              <th className="px-2 md:px-4 py-3 text-right">MMR</th>
+              <th className="px-2 md:px-4 py-3 text-right">Games</th>
             </tr>
           </thead>
 
@@ -162,11 +162,11 @@ if (!battletag) {
                       : "bg-gray-50/50 dark:bg-gray-800/40"
                   }`}
                 >
-                  <td className="px-4 py-3 font-medium">{r.race}</td>
+                  <td className="px-2 md:px-4 py-3 font-medium">{r.race}</td>
 
                   {/* GLOBAL */}
                   <td
-                    className="px-4 py-3 text-right font-semibold"
+                    className="px-2 md:px-4 py-3 text-right font-semibold"
                     style={isTop10Global ? { color: "#059669" } : undefined}
                   >
                     #{r.globalRank}/{r.globalTotal}
@@ -174,7 +174,7 @@ if (!battletag) {
 
                   {/* COUNTRY */}
                   <td
-                    className="px-4 py-3 text-right font-semibold"
+                    className="px-2 md:px-4 py-3 text-right font-semibold"
                     style={isTop10Country ? { color: "#059669" } : undefined}
                   >
                     {r.countryRank
@@ -182,11 +182,11 @@ if (!battletag) {
                       : "—"}
                   </td>
 
-                  <td className="px-4 py-3 text-right font-semibold">
+                  <td className="px-2 md:px-4 py-3 text-right font-semibold">
                     {r.mmr}
                   </td>
 
-                  <td className="px-4 py-3 text-right text-gray-500">
+                  <td className="px-2 md:px-4 py-3 text-right text-gray-500">
                     {r.games}
                   </td>
                 </tr>
@@ -228,7 +228,8 @@ if (!battletag) {
           <Section title="Largest MMR Gains in the Last 3 Seasons">
             {s.gainGamesToShow.length ? (
               s.gainGamesToShow.map((g, i) => (
-                <div key={i} className="grid grid-cols-[1fr_auto] gap-x-3 rounded border p-2 text-sm tabular-nums">
+                <div key={i} className="grid grid-cols-[1fr_auto] gap-x-3 rounded border p-2 text-xs md:text-sm tabular-nums"
+>
                   <span>
                     <span className="font-semibold">{s.battletag}</span> ({myRace(g)} {g.myMMR}) vs{" "}
                     <span className="font-semibold">{g.oppName}</span> ({g.oppRace} {g.oppMMR})
@@ -243,7 +244,7 @@ if (!battletag) {
 
           <Section title="Largest MMR Gap Win in the Last 3 Seasons">
             {s.largestGapWin ? (
-              <div className="grid grid-cols-[1fr_auto] gap-x-3 rounded border p-3 text-sm tabular-nums">
+              <div className="grid grid-cols-[1fr_auto] gap-x-3 rounded border p-3 text-xs md:text-sm tabular-nums">
                 <span>
                   <span className="font-semibold">{s.battletag}</span> ({myRace(s.largestGapWin)} {s.largestGapWin.myMMR}) vs{" "}
                   <span className="font-semibold">{s.largestGapWin.oppName}</span> ({s.largestGapWin.oppRace} {s.largestGapWin.oppMMR})

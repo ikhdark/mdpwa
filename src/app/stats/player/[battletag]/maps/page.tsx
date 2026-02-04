@@ -20,7 +20,9 @@ export default async function MapStatsPage({ params }: PageProps) {
   if (!data) return <EmptyState message="Not enough data/recent games available" />;
 
   return (
-    <div className="space-y-10 max-w-6xl mx-auto text-sm leading-relaxed">
+    <div className="space-y-8 max-w-6xl mx-auto text-xs md:text-sm leading-relaxed px-3 md:px-0">
+
+
 
       {/* HEADER */}
       <PlayerHeader
@@ -66,7 +68,8 @@ export default async function MapStatsPage({ params }: PageProps) {
             return (
               <div
                 key={b.label}
-                className="grid grid-cols-[110px_1fr_auto] items-center gap-x-3"
+                className="grid grid-cols-[80px_1fr_auto] md:grid-cols-[110px_1fr_auto] items-center gap-x-3"
+
               >
                 <div className="text-gray-500">{b.label}</div>
 
@@ -106,11 +109,12 @@ export default async function MapStatsPage({ params }: PageProps) {
                     return (
                       <div
                         key={m.map}
-                        className="flex justify-between tabular-nums"
+                        className="flex justify-between tabular-nums text-xs md:text-sm"
+
                       >
                         <div>
                           <div>{m.map}</div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-[11px] md:text-xs text-gray-500">
                             {m.wins}-{m.losses} · {m.games} games · {m.avgMinutes} min avg
                           </div>
                         </div>

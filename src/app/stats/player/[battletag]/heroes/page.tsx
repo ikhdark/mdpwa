@@ -15,7 +15,8 @@ export default async function HeroesPage({ params }: PageProps) {
   if (!battletag) return <EmptyState message="Player not found" />;
 
   const data = await getW3CHeroStats(battletag);
- if (!data || !data.result) return <EmptyState message="Not enough data/recent games available" />;
+  if (!data || !data.result)
+    return <EmptyState message="Not enough data/recent games available" />;
 
   /* -------------------- helpers -------------------- */
 
@@ -74,12 +75,12 @@ export default async function HeroesPage({ params }: PageProps) {
   /* -------------------- render -------------------- */
 
   return (
-    <div className="space-y-10 max-w-6xl mx-auto text-sm leading-relaxed">
+    <div className="space-y-8 max-w-6xl mx-auto text-xs md:text-sm px-3 md:px-0">
 
       {/* HEADER */}
       <PlayerHeader
         battletag={data.battletag}
-        subtitle={`Hero Stats (All races) · Season 24 (Games under 120 seconds excluded)`}
+        subtitle="Hero Stats (All races) · Season 24 (Games under 120 seconds excluded)"
       />
 
       {/* ================= HERO COUNT ================= */}
@@ -154,7 +155,10 @@ export default async function HeroesPage({ params }: PageProps) {
           const value = idx !== -1 ? l.slice(idx + 1).trim() : "";
 
           return (
-            <div key={i} className="flex justify-between tabular-nums">
+            <div
+              key={i}
+              className="flex justify-between tabular-nums text-xs md:text-sm"
+            >
               <span>{label}</span>
               <span className="font-medium">{value}</span>
             </div>
@@ -170,7 +174,10 @@ export default async function HeroesPage({ params }: PageProps) {
           const value = idx !== -1 ? l.slice(idx + 1).trim() : "";
 
           return (
-            <div key={i} className="flex justify-between tabular-nums">
+            <div
+              key={i}
+              className="flex justify-between tabular-nums text-xs md:text-sm"
+            >
               <span>{label}</span>
               <span className="font-medium">{value}</span>
             </div>

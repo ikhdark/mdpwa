@@ -80,7 +80,8 @@ if (!data || !data.full?.length) {
   const highlightLower = highlight?.toLowerCase() ?? null;
 
   return (
-    <div className="space-y-8 max-w-6xl mx-auto">
+    <div className="space-y-8 max-w-6xl mx-auto text-xs md:text-sm px-3 md:px-0">
+
       <PlayerHeader
         battletag={canonicalBt}
         subtitle={`${raceLabel(race)} Ladder · Season 24 · ${poolSize.toLocaleString()} players`}
@@ -94,7 +95,7 @@ if (!data || !data.full?.length) {
 
       {me && (
         <Section title="Your Rank">
-          <div className="text-sm">
+          <div className="text-xs md:text-sm">
             Rank <b>#{me.rank}</b> · Score <b>{num(me.score, 1)}</b> · MMR{" "}
             <b>{me.mmr}</b>
           </div>
@@ -103,16 +104,16 @@ if (!data || !data.full?.length) {
 
       <Section title={`Page ${currentPage} / ${totalPages}`}>
         <div className="overflow-x-auto">
-          <table className="w-full table-fixed text-sm border-collapse font-mono tabular-nums">
+          <table className="w-full table-fixed text-xs md:text-sm border-collapse font-mono tabular-nums">
 
             <thead className="text-xs uppercase text-gray-500">
               <tr className="border-b border-gray-300 dark:border-gray-700">
-                <th className="text-left w-12">#</th>
-                <th className="text-left w-44">Player</th>
-                <th className="text-right w-20">Score</th>
-                <th className="text-right w-20">MMR</th>
-                <th className="text-right w-20">SoS</th>
-                <th className="text-right w-16">W-L</th>
+                <th className="text-left w-10 md:w-12">#</th>
+<th className="text-left w-28 md:w-44">Player</th>
+<th className="text-right w-16 md:w-20">Score</th>
+<th className="text-right w-16 md:w-20">MMR</th>
+<th className="text-right w-16 md:w-20">SoS</th>
+<th className="text-right w-14 md:w-16">W-L</th>
               </tr>
             </thead>
 
@@ -158,7 +159,7 @@ if (!data || !data.full?.length) {
           </table>
         </div>
 
-        <div className="flex items-center justify-center gap-2 pt-4 text-sm">
+        <div className="flex items-center justify-center gap-2 pt-4 text-xs md:text-sm">
           {currentPage > 1 && (
             <Link
               href={`${base}?page=${currentPage - 1}`}

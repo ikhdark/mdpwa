@@ -110,25 +110,25 @@ const favoredLarge  = buildThresholds(favoredBuckets, [200, 250, 300]);
     colorFn: (w: number) => string;
   }) => (
     <div className="overflow-x-auto rounded-lg border dark:border-gray-700">
-      <table className="w-full text-sm">
+      <table className="w-full text-xs md:text-sm">
         <thead className="bg-gray-50 dark:bg-gray-800">
           <tr className="text-left">
-            <th className="px-4 py-2">Gap</th>
-            <th className="px-4 py-2">Games</th>
-            <th className="px-4 py-2">W</th>
-            <th className="px-4 py-2">L</th>
-            <th className="px-4 py-2">Winrate</th>
+            <th className="px-2 md:px-4 py-2">Gap</th>
+            <th className="px-2 md:px-4 py-2">Games</th>
+            <th className="px-2 md:px-4 py-2">W</th>
+            <th className="px-2 md:px-4 py-2">L</th>
+            <th className="px-2 md:px-4 py-2">Winrate</th>
           </tr>
         </thead>
 
         <tbody>
           {rows.map((b) => (
             <tr key={b.min} className="border-t dark:border-gray-700">
-              <td className="px-4 py-2 font-mono">{label(b)}</td>
-              <td className="px-4 py-2">{b.games}</td>
-              <td className="px-4 py-2">{b.wins}</td>
-              <td className="px-4 py-2">{b.losses}</td>
-              <td className={`px-4 py-2 ${colorFn(b.winrate)}`}>
+              <td className="px-2 md:px-4 py-2 font-mono">{label(b)}</td>
+              <td className="px-2 md:px-4 py-2">{b.games}</td>
+              <td className="px-2 md:px-4 py-2">{b.wins}</td>
+              <td className="px-2 md:px-4 py-2">{b.losses}</td>
+              <td className={`px-2 md:px-4 py-2 ${colorFn(b.winrate)}`}>
                 {pct(b.winrate)}
               </td>
             </tr>
@@ -143,7 +143,8 @@ const underdogLarge  = underdogBuckets.filter((b) => Math.abs(b.min) >= 150);
   /* ================= RENDER ================= */
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 max-w-6xl mx-auto text-xs md:text-sm px-3 md:px-0">
+
       <PlayerHeader
         battletag={canonicalBt}
         subtitle="Performance Stats (All Races) · Season 24"

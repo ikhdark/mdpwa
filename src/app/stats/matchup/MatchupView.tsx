@@ -37,7 +37,8 @@ function Board({
       {rows.map((r) => (
         <div
           key={r.label}
-          className="grid grid-cols-3 px-4 py-3 border-t text-sm items-center"
+          className="grid grid-cols-3 px-3 py-2 border-t text-xs md:text-sm items-center"
+
         >
           <div className="text-left font-medium">{r.a}</div>
           <div className="text-center text-xs uppercase text-gray-600 dark:text-gray-300">
@@ -220,7 +221,7 @@ export default function MatchupView({ stats }: { stats: any }) {
       </Section>
 
 <Section title="Hero Usage, Record & Winrate">
-  <div className="grid grid-cols-2 gap-4">
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
     {/* Player A */}
     <div className="rounded-xl border bg-white dark:bg-gray-900 p-4">
@@ -245,7 +246,7 @@ export default function MatchupView({ stats }: { stats: any }) {
         .filter(h => h.usage > 0)
         .sort((a, b) => b.usage - a.usage)
         .map(h => (
-          <div key={h.hero} className="grid grid-cols-4 text-sm py-1">
+          <div key={h.hero} className="grid grid-cols-4 text-xs md:text-sm py-1">
             <span>{h.hero}</span>
             <span className="text-center">{pct(h.usage)}</span>
             <span className="text-center">{h.wins}-{h.losses}</span>
@@ -277,7 +278,8 @@ export default function MatchupView({ stats }: { stats: any }) {
         .filter(h => h.usage > 0)
         .sort((a, b) => b.usage - a.usage)
         .map(h => (
-          <div key={h.hero} className="grid grid-cols-4 text-sm py-1">
+          <div key={h.hero} className="grid grid-cols-4 text-xs md:text-sm py-1">
+
             <span>{h.hero}</span>
             <span className="text-center">{pct(h.usage)}</span>
             <span className="text-center">{h.wins}-{h.losses}</span>
@@ -291,6 +293,7 @@ export default function MatchupView({ stats }: { stats: any }) {
 
 
 <Section title="Map Winrates">
+  <div className="overflow-x-auto">
   <Board
     aLabel={stats.playerA}
     bLabel={stats.playerB}
@@ -301,7 +304,8 @@ export default function MatchupView({ stats }: { stats: any }) {
         a: pct(m.winrateA),
         b: pct(m.winrateB),
       }))}
-  />
+   />
+  </div>
 </Section>
 
       {/* ========================================= */}

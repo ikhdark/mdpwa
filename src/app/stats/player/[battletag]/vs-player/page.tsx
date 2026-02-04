@@ -1,5 +1,7 @@
 // src/app/stats/player/[battletag]/vs-player/page.tsx
+
 export const revalidate = 300;
+
 import EmptyState from "@/components/EmptyState";
 import { getPlayerVsPlayer, displayMyRace } from "@/services/playerVsPlayer";
 import { PlayerHeader, Section } from "@/components/PlayerUI";
@@ -10,14 +12,16 @@ type PageProps = {
 
 export default async function VsPlayerPage({ params }: PageProps) {
   const { battletag } = await params;
+
   if (!battletag) {
-  return <EmptyState message="Invalid player" />;
-}
+    return <EmptyState message="Invalid player" />;
+  }
 
   const data = await getPlayerVsPlayer(battletag);
+
   if (!data) {
-  return <EmptyState message="Not enough data/recent games available" />;
-}
+    return <EmptyState message="Not enough data/recent games available" />;
+  }
 
   /* ================= helpers ================= */
 
@@ -27,8 +31,8 @@ export default async function VsPlayerPage({ params }: PageProps) {
   /* ================= render ================= */
 
   return (
-    <div className="space-y-10 max-w-6xl mx-auto text-sm leading-relaxed">
-      {/* HEADER */}
+    <div className="space-y-8 max-w-6xl mx-auto text-xs md:text-sm px-3 md:px-0">
+
       <PlayerHeader
         battletag={data.battletag}
         subtitle="Opponent Stats (All Races) · Season 24 (Games under 120 seconds excluded)"
@@ -38,13 +42,15 @@ export default async function VsPlayerPage({ params }: PageProps) {
       <Section title="MMR Extremes">
         {data.extremes.gainGamesToShow.length > 0 && (
           <div className="space-y-2">
-            <div className="font-medium">Largest Single-Game Gain/Loss (If +15 or more, all will be added)</div>
+            <div className="font-medium">
+              Largest Single-Game Gain/Loss (If +15 or more, all will be added)
+            </div>
 
             {data.extremes.gainGamesToShow.map((g, i) => (
               <div key={i} className="grid grid-cols-[auto_1fr_auto] gap-x-3">
                 <span className="font-semibold text-emerald-600">W</span>
 
-                <span>
+                <span className="min-w-0 break-words">
                   <span className="font-semibold">{g.myName}</span>{" "}
                   ({myRace(g)} {g.myMMR}) vs{" "}
                   <span className="font-semibold">{g.oppName}</span>{" "}
@@ -63,7 +69,7 @@ export default async function VsPlayerPage({ params }: PageProps) {
           <div className="mt-3 grid grid-cols-[auto_1fr_auto] gap-x-3">
             <span className="font-semibold text-rose-600">L</span>
 
-            <span>
+            <span className="min-w-0 break-words">
               <span className="font-semibold">
                 {data.extremes.largestLossGame.myName}
               </span>{" "}
@@ -89,7 +95,7 @@ export default async function VsPlayerPage({ params }: PageProps) {
           <div className="grid grid-cols-[auto_1fr_auto] gap-x-3">
             <span className="font-semibold text-emerald-600">W</span>
 
-            <span>
+            <span className="min-w-0 break-words">
               <span className="font-semibold">
                 {data.extremes.largestGapWin.myName}
               </span>{" "}
@@ -112,7 +118,7 @@ export default async function VsPlayerPage({ params }: PageProps) {
           <div className="grid grid-cols-[auto_1fr_auto] gap-x-3 mt-1">
             <span className="font-semibold text-rose-600">L</span>
 
-            <span>
+            <span className="min-w-0 break-words">
               <span className="font-semibold">
                 {data.extremes.largestGapLoss.myName}
               </span>{" "}
@@ -135,7 +141,7 @@ export default async function VsPlayerPage({ params }: PageProps) {
       {/* ================= Best ================= */}
       {data.best && (
         <Section title="Best Winrate vs Opponent (MMR-Weighted)">
-          <div className="space-y-2 mb-2">
+          <div className="space-y-1 mb-2">
             <div>Opponent: {data.best.tag}</div>
             <div>Record: {data.best.wins}-{data.best.losses}</div>
             <div>Games: {data.best.totalGames}</div>
@@ -144,26 +150,18 @@ export default async function VsPlayerPage({ params }: PageProps) {
           <div className="space-y-1">
             {data.best.gamesSortedByOppMMRDesc.map((g, i) => (
               <div key={i} className="grid grid-cols-[auto_1fr_auto] gap-x-3">
-                <span
-                  className={`font-semibold ${
-                    g.result === "W" ? "text-emerald-600" : "text-rose-600"
-                  }`}
-                >
+                <span className={`font-semibold ${g.result === "W" ? "text-emerald-600" : "text-rose-600"}`}>
                   {g.result}
                 </span>
 
-                <span>
+                <span className="min-w-0 break-words">
                   <span className="font-semibold">{g.myName}</span>{" "}
                   ({myRace(g)} {g.myMMR}) vs{" "}
                   <span className="font-semibold">{g.oppName}</span>{" "}
                   ({g.oppRace} {g.oppMMR})
                 </span>
 
-                <span
-                  className={`font-medium ${
-                    g.mmrChange >= 0 ? "text-emerald-600" : "text-rose-600"
-                  }`}
-                >
+                <span className={`font-medium ${g.mmrChange >= 0 ? "text-emerald-600" : "text-rose-600"}`}>
                   {signed(g.mmrChange)}
                 </span>
               </div>
@@ -175,8 +173,7 @@ export default async function VsPlayerPage({ params }: PageProps) {
       {/* ================= Worst ================= */}
       {data.worst && (
         <Section title="Lowest Winrate vs Opponent">
-          {/* ✅ add summary like Best */}
-          <div className="space-y-2 mb-2">
+          <div className="space-y-1 mb-2">
             <div>Opponent: {data.worst.tag}</div>
             <div>Record: {data.worst.wins}-{data.worst.losses}</div>
             <div>Games: {data.worst.totalGames}</div>
@@ -185,26 +182,18 @@ export default async function VsPlayerPage({ params }: PageProps) {
           <div className="space-y-1">
             {data.worst.gamesSortedByOppMMRDesc.map((g, i) => (
               <div key={i} className="grid grid-cols-[auto_1fr_auto] gap-x-3">
-                <span
-                  className={`font-semibold ${
-                    g.result === "W" ? "text-emerald-600" : "text-rose-600"
-                  }`}
-                >
+                <span className={`font-semibold ${g.result === "W" ? "text-emerald-600" : "text-rose-600"}`}>
                   {g.result}
                 </span>
 
-                <span>
+                <span className="min-w-0 break-words">
                   <span className="font-semibold">{g.myName}</span>{" "}
                   ({myRace(g)} {g.myMMR}) vs{" "}
                   <span className="font-semibold">{g.oppName}</span>{" "}
                   ({g.oppRace} {g.oppMMR})
                 </span>
 
-                <span
-                  className={`font-medium ${
-                    g.mmrChange >= 0 ? "text-emerald-600" : "text-rose-600"
-                  }`}
-                >
+                <span className={`font-medium ${g.mmrChange >= 0 ? "text-emerald-600" : "text-rose-600"}`}>
                   {signed(g.mmrChange)}
                 </span>
               </div>

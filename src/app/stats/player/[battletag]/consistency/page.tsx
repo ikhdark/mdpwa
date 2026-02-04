@@ -31,7 +31,6 @@ export default async function ConsistencyPage({ params }: PageProps) {
   for (const m of data.matches) {
     const d = new Date(m.startTime);
 
-    // UTC buckets (consistent for NA/EU/ASIA)
     const day = d.getUTCDay();
     const hour = d.getUTCHours();
 
@@ -46,7 +45,7 @@ export default async function ConsistencyPage({ params }: PageProps) {
 
     map.set(key, {
       games: (prev?.games ?? 0) + 1,
-      wins:  (prev?.wins  ?? 0) + (m.didWin ? 1 : 0),
+      wins: (prev?.wins ?? 0) + (m.didWin ? 1 : 0),
     });
   }
 
@@ -58,7 +57,7 @@ export default async function ConsistencyPage({ params }: PageProps) {
       const v = map.get(key);
 
       const games = v?.games ?? 0;
-      const wins  = v?.wins ?? 0;
+      const wins = v?.wins ?? 0;
 
       cells.push({
         day,
@@ -74,7 +73,7 @@ export default async function ConsistencyPage({ params }: PageProps) {
   /* ================= RENDER ================= */
 
   return (
-    <div className="space-y-10 max-w-6xl mx-auto text-sm leading-relaxed">
+    <div className="space-y-8 max-w-6xl mx-auto text-xs md:text-sm px-3 md:px-0">
 
       <PlayerHeader
         battletag={data.battletag}
