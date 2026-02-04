@@ -150,39 +150,34 @@ export default async function HeroesPage({ params }: PageProps) {
       {/* ================= BEST OVERALL ================= */}
       <Section title="Best Winrates vs Opponent Heroes (Overall)">
         {bestOverall.map((l, i) => {
-          const idx = l.indexOf(":");
-          const label = idx !== -1 ? l.slice(0, idx) : l;
-          const value = idx !== -1 ? l.slice(idx + 1).trim() : "";
+  const m = l.match(/(.+?):\s([\d.]+)%\s\((\d+)-(\d+)\)/);
 
-          return (
-            <div
-              key={i}
-              className="flex justify-between tabular-nums text-xs md:text-sm"
-            >
-              <span>{label}</span>
-              <span className="font-medium">{value}</span>
-            </div>
-          );
-        })}
+  return (
+    <StatRow
+      key={i}
+      label={m?.[1] ?? l}
+      value={m ? `${m[3]}–${m[4]} (${Math.round(Number(m[2]))}%)` : l}
+      winrate={m ? Number(m[2]) : undefined}
+    />
+  );
+})}
+
       </Section>
 
       {/* ================= WORST OVERALL ================= */}
       <Section title="Worst Winrates vs Opponent Heroes (Overall)">
-        {worstOverall.map((l, i) => {
-          const idx = l.indexOf(":");
-          const label = idx !== -1 ? l.slice(0, idx) : l;
-          const value = idx !== -1 ? l.slice(idx + 1).trim() : "";
+      {worstOverall.map((l, i) => {
+  const m = l.match(/(.+?):\s([\d.]+)%\s\((\d+)-(\d+)\)/);
 
-          return (
-            <div
-              key={i}
-              className="flex justify-between tabular-nums text-xs md:text-sm"
-            >
-              <span>{label}</span>
-              <span className="font-medium">{value}</span>
-            </div>
-          );
-        })}
+  return (
+    <StatRow
+      key={i}
+      label={m?.[1] ?? l}
+      value={m ? `${m[3]}–${m[4]} (${Math.round(Number(m[2]))}%)` : l}
+      winrate={m ? Number(m[2]) : undefined}
+    />
+  );
+})}
       </Section>
 
     </div>

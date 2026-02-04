@@ -130,25 +130,25 @@ if (!data || !data.full?.length) {
                       isHighlight ? "bg-yellow-100 dark:bg-yellow-900/40" : ""
                     }`}
                   >
-                    <td className="py-1.5">#{p.rank}</td>
+                    <td className="px-2 md:px-4 py-1.5 ">#{p.rank}</td>
 
-                    <td className="py-1.5 truncate font-sans">
+                    <td className="px-2 md:px-4 py-1.5  truncate font-sans">
                       {p.battletag}
                     </td>
 
-                    <td className="py-1.5 text-right font-semibold">
+                    <td className="px-2 md:px-4 py-1.5 text-right font-semibold">
                       {num(p.score, 1)}
                     </td>
 
-                    <td className="py-1.5 text-right font-semibold">
+                    <td className="px-2 md:px-4 py-1.5 text-right font-semibold">
                       {p.mmr}
                     </td>
 
-                    <td className="py-1.5 text-right font-semibold">
+                    <td className="px-2 md:px-4 py-1.5 text-right font-semibold">
                       {num(p.sos, 0)}
                     </td>
 
-                    <td className="py-1.5 text-right">
+                    <td className="px-2 md:px-4 py-1.5 text-right">
                       {p.wins}-{p.losses}
                     </td>
                   </tr>

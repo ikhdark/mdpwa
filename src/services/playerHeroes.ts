@@ -98,73 +98,79 @@ export async function getW3CHeroStats(inputTag: string) {
     3: { games: 0, wins: 0, losses: 0 },
   };
 
-  /* -------------------- MATCH PROCESSING -------------------- */
+/* -------------------- MATCH PROCESSING -------------------- */
 
-  for (const match of matches) {
-    if (match?.gameMode !== 1 || !Array.isArray(match?.teams)) continue;
+let totalGames = 0;
+let totalWins = 0;
 
-    const players = match.teams.flatMap((t: any) => t.players ?? []);
-    if (players.length !== 2) continue;
+for (const match of matches) {
+  if (match?.gameMode !== 1 || !Array.isArray(match?.teams)) continue;
 
-    const me = players.find(
-      (p: any) =>
-        p?.battleTag?.toLowerCase() === canonicalLower ||
-        (playerIdLower && p?.playerId?.toLowerCase() === playerIdLower)
-    );
+  const players = match.teams.flatMap((t: any) => t.players ?? []);
+  if (players.length !== 2) continue;
 
-    const opp = players.find((p: any) => p !== me);
+  const me = players.find(
+    (p: any) =>
+      p?.battleTag?.toLowerCase() === canonicalLower ||
+      (playerIdLower && p?.playerId?.toLowerCase() === playerIdLower)
+  );
 
-    if (!me || !opp || !Array.isArray(me.heroes) || !Array.isArray(opp.heroes))
-      continue;
+  const opp = players.find((p: any) => p !== me);
 
-    const didWin = me.won === true;
+  if (!me || !opp || !Array.isArray(me.heroes) || !Array.isArray(opp.heroes))
+    continue;
 
-    // 🔒 HARD CLAMP (THE ACTUAL FIX)
-    const yourHeroCount = Math.min(Math.max(me.heroes.length, 1), 3) as 1 | 2 | 3;
-    const oppHeroCount  = Math.min(Math.max(opp.heroes.length, 1), 3) as 1 | 2 | 3;
+  const didWin = me.won === true;
 
-    yourHeroCountStats[yourHeroCount].games++;
+  /* ✅ baseline counters (MUST be here) */
+  totalGames++;
+  if (didWin) totalWins++;
+
+  /* hero count clamps */
+  const yourHeroCount = Math.min(Math.max(me.heroes.length, 1), 3) as 1 | 2 | 3;
+  const oppHeroCount  = Math.min(Math.max(opp.heroes.length, 1), 3) as 1 | 2 | 3;
+
+  yourHeroCountStats[yourHeroCount].games++;
+  didWin
+    ? yourHeroCountStats[yourHeroCount].wins++
+    : yourHeroCountStats[yourHeroCount].losses++;
+
+  opponentHeroCountStats[oppHeroCount].games++;
+  didWin
+    ? opponentHeroCountStats[oppHeroCount].wins++
+    : opponentHeroCountStats[oppHeroCount].losses++;
+
+ const uniqueOppHeroes = new Set<string>(
+    opp.heroes.map((h: any) => h?.name).filter(Boolean)
+  );
+
+  for (const hero of uniqueOppHeroes) {
+    opponentHeroStats[hero] ??= { games: 0, wins: 0, losses: 0 };
+    opponentHeroStats[hero].games++;
     didWin
-      ? yourHeroCountStats[yourHeroCount].wins++
-      : yourHeroCountStats[yourHeroCount].losses++;
-
-    opponentHeroCountStats[oppHeroCount].games++;
-    didWin
-      ? opponentHeroCountStats[oppHeroCount].wins++
-      : opponentHeroCountStats[oppHeroCount].losses++;
-
-const uniqueOppHeroes: Set<string> = new Set(
-  opp.heroes
-    .map((h: any) => h?.name)
-    .filter(Boolean)
-);
-    for (const hero of uniqueOppHeroes) {
-      opponentHeroStats[hero] ??= { games: 0, wins: 0, losses: 0 };
-      opponentHeroStats[hero].games++;
-      didWin
-        ? opponentHeroStats[hero].wins++
-        : opponentHeroStats[hero].losses++;
-    }
-
-    const primaryHero = opp.heroes[0]?.name;
-    if (primaryHero) {
-      opponentPrimaryHeroStats[primaryHero] ??= {
-        games: 0,
-        wins: 0,
-        losses: 0,
-      };
-      opponentPrimaryHeroStats[primaryHero].games++;
-      didWin
-        ? opponentPrimaryHeroStats[primaryHero].wins++
-        : opponentPrimaryHeroStats[primaryHero].losses++;
-    }
+      ? opponentHeroStats[hero].wins++
+      : opponentHeroStats[hero].losses++;
   }
 
-  /* -------------------- BASELINE -------------------- */
+  const primaryHero = opp.heroes[0]?.name;
+  if (primaryHero) {
+    opponentPrimaryHeroStats[primaryHero] ??= {
+      games: 0,
+      wins: 0,
+      losses: 0,
+    };
 
-const totalGames = matches.length;
+    opponentPrimaryHeroStats[primaryHero].games++;
+    didWin
+      ? opponentPrimaryHeroStats[primaryHero].wins++
+      : opponentPrimaryHeroStats[primaryHero].losses++;
+  }
+}
 
-let totalWins = 0;
+/* -------------------- BASELINE -------------------- */
+
+const baselineWinrate = totalGames ? totalWins / totalGames : 0;
+
 
 for (const match of matches) {
   const players = match.teams?.flatMap((t: any) => t.players ?? []) ?? [];
@@ -177,8 +183,6 @@ for (const match of matches) {
 
   if (me?.won === true) totalWins++;
 }
-
-const baselineWinrate = totalGames ? totalWins / totalGames : 0;
 
   /* -------------------- OUTPUT (UNCHANGED) -------------------- */
 
@@ -252,9 +256,8 @@ const sortedByDelta = Object.entries(opponentHeroStats)
 const bestFive = sortedByDelta.slice(0, 5);
 
 bestFive.forEach(([hero, s]) => {
-  const wr = ((100 * s.wins) / s.games).toFixed(1);
-  const delta = (((s.wins / s.games) - baselineWinrate) * 100).toFixed(1);
-  line(`${heroDisplay(hero)}: ${wr}% (+${delta}%)`);
+const wr = Math.round((100 * s.wins) / s.games);
+line(`${heroDisplay(hero)}: ${wr}% (${s.wins}-${s.losses})`);
 });
 
 
@@ -273,9 +276,8 @@ sortedByDelta
   })
   .slice(0, 5)
   .forEach(([hero, s]) => {
-    const wr = ((100 * s.wins) / s.games).toFixed(1);
-    const delta = (((s.wins / s.games) - baselineWinrate) * 100).toFixed(1);
-    line(`${heroDisplay(hero)}: ${wr}% (${delta}%)`);
+ const wr = Math.round((100 * s.wins) / s.games);
+line(`${heroDisplay(hero)}: ${wr}% (${s.wins}-${s.losses})`);
   });
 
 

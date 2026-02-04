@@ -28,7 +28,8 @@ function Board({
 }) {
   return (
     <div className="rounded-xl border bg-white dark:bg-gray-900 overflow-hidden">
-      <div className="grid grid-cols-3 text-xs font-semibold uppercase px-3 py-2 bg-gray-100 dark:bg-gray-800">
+      <div className="grid grid-cols-[1fr_auto_1fr] text-xs font-semibold uppercase px-3 py-2 bg-gray-100 dark:bg-gray-800">
+
         <div className="text-left">{aLabel}</div>
         <div className="text-center text-gray-600 dark:text-gray-300">Stat</div>
         <div className="text-right">{bLabel}</div>
@@ -37,7 +38,8 @@ function Board({
       {rows.map((r) => (
         <div
           key={r.label}
-          className="grid grid-cols-3 px-3 py-2 border-t text-xs md:text-sm items-center"
+          className="grid grid-cols-[1fr_auto_1fr] px-3 py-2 border-t text-xs md:text-sm items-center"
+
 
         >
           <div className="text-left font-medium">{r.a}</div>
