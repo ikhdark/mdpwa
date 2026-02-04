@@ -103,7 +103,9 @@ export default function TimeHeatmap({ data }: { data: Cell[] }) {
     <div className="space-y-6">
 
       {/* TABLE */}
-      <div className="grid grid-cols-5 gap-2 text-sm tabular-nums">
+      <div className="grid grid-cols-[70px_repeat(4,1fr)] gap-2 text-xs tabular-nums whitespace-nowrap">
+
+
 
         {/* header */}
         <div />
@@ -132,7 +134,8 @@ export default function TimeHeatmap({ data }: { data: Cell[] }) {
                 return (
                   <div
                     key={`${day}-${bucket}`}
-                    className="h-10 rounded border border-gray-200 bg-white flex items-center justify-center"
+                    className="h-10 px-2 rounded border border-gray-200 bg-white flex items-center justify-center whitespace-nowrap text-[11px] font-semibold"
+
                   >
                    {cell?.winrate != null ? (
   <span className={textColor(cell.winrate)}>
@@ -144,7 +147,8 @@ export default function TimeHeatmap({ data }: { data: Cell[] }) {
               })}
 
               {/* row total */}
-              <div className="h-10 rounded border border-gray-300 bg-gray-50 flex items-center justify-center font-semibold">
+              <div className="h-10 px-2 rounded border border-gray-300 bg-gray-50 flex items-center justify-center whitespace-nowrap text-[11px] font-semibold
+">
                 {rt.winrate != null ? (
                   <span className={textColor(rt.winrate)}>
                     {rt.winrate}% ({rt.wins}-{rt.losses})
