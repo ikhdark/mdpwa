@@ -28,7 +28,7 @@ function Board({
 }) {
   return (
     <div className="rounded-xl border bg-white dark:bg-gray-900 overflow-hidden">
-      <div className="grid grid-cols-3 text-xs font-semibold uppercase px-4 py-2 bg-gray-100 dark:bg-gray-800">
+      <div className="grid grid-cols-3 text-xs font-semibold uppercase px-3 py-2 bg-gray-100 dark:bg-gray-800">
         <div className="text-left">{aLabel}</div>
         <div className="text-center text-gray-600 dark:text-gray-300">Stat</div>
         <div className="text-right">{bLabel}</div>
@@ -237,7 +237,7 @@ export default function MatchupView({ stats }: { stats: any }) {
 
       {Object.entries(stats.statsA.heroUsage as Record<string, { games: number; wins: number }>)
         .map(([hero, v]) => {
-          const usage = v.games / stats.statsA.overall.games;
+          const usage = stats.statsA.overall.games ? v.games / stats.statsA.overall.games : 0;
           const losses = v.games - v.wins;
           const wr = v.games ? v.wins / v.games : 0;
 
@@ -269,7 +269,8 @@ export default function MatchupView({ stats }: { stats: any }) {
 
       {Object.entries(stats.statsB.heroUsage as Record<string, { games: number; wins: number }>)
         .map(([hero, v]) => {
-          const usage = v.games / stats.statsB.overall.games;
+          const usage = stats.statsB.overall.games ? v.games / stats.statsB.overall.games : 0;
+
           const losses = v.games - v.wins;
           const wr = v.games ? v.wins / v.games : 0;
 
