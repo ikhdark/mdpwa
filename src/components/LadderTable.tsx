@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useMemo, useCallback } from "react";
 import type { LadderRow } from "@/lib/ladderEngine";
 
 type Props = {
@@ -11,10 +12,12 @@ type Props = {
   highlight?: string;
 };
 
-function num(n: number | null | undefined, d = 0) {
-  if (n == null) return "—";
-  return n.toFixed(d);
-}
+/* stable helper */
+const fmt = (n: number | null | undefined, d = 0) =>
+  n == null ? "—" : n.toFixed(d);
+
+const ROW_BASE = "border-b border-gray-200 dark:border-gray-800";
+const ROW_HIGHLIGHT = "bg-yellow-100 dark:bg-yellow-900/40";
 
 export default function LadderTable({
   rows,
@@ -23,12 +26,39 @@ export default function LadderTable({
   totalPages,
   highlight,
 }: Props) {
-  const highlightLower = highlight?.toLowerCase() ?? null;
+  /* =============================
+     precompute once
+  ============================= */
+
+  const highlightLower = useMemo(
+    () => highlight?.toLowerCase() ?? null,
+    [highlight]
+  );
+
+  const pageHref = useCallback(
+    (p: number) =>
+      highlight
+        ? `${base}?page=${p}&highlight=${encodeURIComponent(highlight)}`
+        : `${base}?page=${p}`,
+    [base, highlight]
+  );
+
+  /* window of pages without allocating twice */
+  const pages = useMemo(() => {
+    const start = Math.max(1, currentPage - 2);
+    const end = Math.min(totalPages, currentPage + 2);
+
+    const out: number[] = [];
+    for (let i = start; i <= end; i++) out.push(i);
+    return out;
+  }, [currentPage, totalPages]);
+
+  /* ============================= */
 
   return (
     <>
       <div className="overflow-x-auto">
-        <table className="w-full text-sm border-collapse font-mono tabular-nums">
+        <table className="w-full text-sm border-collapse tabular-nums">
           <colgroup>
             <col className="w-12" />
             <col className="w-44" />
@@ -58,31 +88,29 @@ export default function LadderTable({
               return (
                 <tr
                   key={`${p.battletag}-${p.rank}`}
-                  className={`border-b border-gray-200 dark:border-gray-800 ${
-                    isHighlight
-                      ? "bg-yellow-100 dark:bg-yellow-900/40"
-                      : ""
-                  }`}
+                  className={`${ROW_BASE} ${isHighlight ? ROW_HIGHLIGHT : ""}`}
                 >
-                  <td className="py-1.5 whitespace-nowrap">#{p.rank}</td>
+                  <td className="py-1.5 whitespace-nowrap font-mono">
+                    #{p.rank}
+                  </td>
 
                   <td className="py-1.5 truncate font-sans">
                     {p.battletag}
                   </td>
 
-                  <td className="py-1.5 text-right font-semibold">
-                    {num(p.score, 1)}
+                  <td className="py-1.5 text-right font-mono font-semibold">
+                    {fmt(p.score, 1)}
                   </td>
 
-                  <td className="py-1.5 text-right font-semibold">
+                  <td className="py-1.5 text-right font-mono font-semibold">
                     {p.mmr}
                   </td>
 
-                  <td className="py-1.5 text-right font-semibold">
-                    {num(p.sos, 0)}
+                  <td className="py-1.5 text-right font-mono font-semibold">
+                    {fmt(p.sos, 0)}
                   </td>
 
-                  <td className="py-1.5 text-right">
+                  <td className="py-1.5 text-right font-mono">
                     {p.wins}-{p.losses}
                   </td>
                 </tr>
@@ -94,32 +122,24 @@ export default function LadderTable({
 
       <div className="flex items-center justify-center gap-2 pt-4 text-sm">
         {currentPage > 1 && (
-          <Link
-            href={`${base}?page=${currentPage - 1}`}
-            className="px-3 py-1 border rounded"
-          >
+          <Link href={pageHref(currentPage - 1)} className="px-3 py-1 border rounded">
             Prev
           </Link>
         )}
 
-        {Array.from({ length: totalPages }, (_, i) => i + 1)
-          .slice(
-            Math.max(0, currentPage - 3),
-            Math.min(totalPages, currentPage + 2)
-          )
-          .map((p) => (
-            <Link
-              key={p}
-              href={`${base}?page=${p}`}
-              className={`px-3 py-1 border rounded ${
-                p === currentPage
-                  ? "bg-black text-white dark:bg-white dark:text-black"
-                  : ""
-              }`}
-            >
-              {p}
-            </Link>
-          ))}
+        {pages.map((p) => (
+          <Link
+            key={p}
+            href={pageHref(p)}
+            className={`px-3 py-1 border rounded ${
+              p === currentPage
+                ? "bg-black text-white dark:bg-white dark:text-black"
+                : ""
+            }`}
+          >
+            {p}
+          </Link>
+        ))}
       </div>
     </>
   );

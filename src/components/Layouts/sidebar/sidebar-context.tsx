@@ -4,10 +4,12 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import {
   createContext,
   useContext,
-  useEffect,
+  useMemo,
   useState,
   type ReactNode,
 } from "react";
+
+/* ================= TYPES ================= */
 
 type SidebarState = "expanded" | "collapsed";
 
@@ -25,44 +27,40 @@ type SidebarContextType = {
 
 const SidebarContext = createContext<SidebarContextType | null>(null);
 
+/* ================= HOOK ================= */
+
 export function useSidebarContext() {
-  const context = useContext(SidebarContext);
-  if (!context) {
-    throw new Error("useSidebarContext must be used within a SidebarProvider");
+  const ctx = useContext(SidebarContext);
+  if (!ctx) {
+    throw new Error("useSidebarContext must be used within SidebarProvider");
   }
-  return context;
+  return ctx;
 }
+
+/* ================= PROVIDER ================= */
 
 export function SidebarProvider({ children }: { children: ReactNode }) {
   const isMobile = useIsMobile();
-
-  // initialize once instead of syncing forever
   const [isOpen, setIsOpen] = useState(false);
 
-  function toggleSidebar() {
-    setIsOpen((prev) => !prev);
-  }
+  const value = useMemo<SidebarContextType>(() => {
+    const toggleSidebar = () => setIsOpen((v) => !v);
+    const openSidebar = () => setIsOpen(true);
+    const closeSidebar = () => setIsOpen(false);
 
-  function openSidebar() {
-    setIsOpen(true);
-  }
-
-  function closeSidebar() {
-    setIsOpen(false);
-  }
+    return {
+      state: isOpen ? "expanded" : "collapsed",
+      isOpen,
+      setIsOpen,
+      isMobile,
+      toggleSidebar,
+      openSidebar,
+      closeSidebar,
+    };
+  }, [isOpen, isMobile]);
 
   return (
-    <SidebarContext.Provider
-      value={{
-        state: isOpen ? "expanded" : "collapsed",
-        isOpen,
-        setIsOpen,
-        isMobile,
-        toggleSidebar,
-        openSidebar,
-        closeSidebar,
-      }}
-    >
+    <SidebarContext.Provider value={value}>
       {children}
     </SidebarContext.Provider>
   );

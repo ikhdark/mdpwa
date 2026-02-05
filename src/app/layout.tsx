@@ -10,7 +10,7 @@ import type { Metadata } from "next";
 import NextTopLoader from "nextjs-toploader";
 import type { PropsWithChildren } from "react";
 import { Providers } from "./providers";
-import Umami from "@/components/Umami";
+
 
 export const metadata: Metadata = {
   title: {
@@ -67,9 +67,6 @@ export default function RootLayout({ children }: PropsWithChildren) {
           src="https://plausible.io/js/script.js"
           strategy="afterInteractive"
         />
-
-        {/* Umami (client-controlled loader) */}
-        {process.env.NODE_ENV === "production" && <Umami />}
       </body>
     </html>
   );

@@ -42,7 +42,7 @@ export function Header() {
       {/* ================= TITLE ================= */}
       <div className="w-full text-center">
         <h1 className="text-heading-5 font-bold text-dark dark:text-white">
-          KD W3C STATS
+          W3CSTATS
         </h1>
       </div>
     </header>

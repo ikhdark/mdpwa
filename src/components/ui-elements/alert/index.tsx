@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "@/lib/utils";
 import { cva, type VariantProps } from "class-variance-authority";
 import type { HTMLAttributes, ReactNode } from "react";
@@ -7,14 +9,23 @@ import {
   AlertWarningIcon,
 } from "./icons";
 
+/* ============================= */
+/* static styles — avoid cn() inside cva (extra call every render) */
+/* ============================= */
+
 const alertVariants = cva(
-  "flex w-full gap-5 rounded-[10px] border-l-6 px-7 py-8 dark:bg-opacity-30 md:p-9",
+  "flex items-start gap-3 w-full rounded-lg border p-4 text-sm bg-white dark:bg-gray-900",
   {
     variants: {
       variant: {
-        success: "border-green bg-green-light-7 dark:bg-[#1B1B24]",
-        warning: "border-[#FFB800] bg-[#FEF5DE] dark:bg-[#1B1B24]",
-        error: "border-red-light bg-red-light-5 dark:bg-[#1B1B24]",
+        success:
+          "border-emerald-200 bg-emerald-50/50 text-emerald-800 dark:border-emerald-900 dark:bg-emerald-900/20 dark:text-emerald-300",
+
+        warning:
+          "border-yellow-200 bg-yellow-50/50 text-yellow-800 dark:border-yellow-900 dark:bg-yellow-900/20 dark:text-yellow-300",
+
+        error:
+          "border-rose-200 bg-rose-50/50 text-rose-800 dark:border-rose-900 dark:bg-rose-900/20 dark:text-rose-300",
       },
     },
     defaultVariants: {
@@ -23,58 +34,50 @@ const alertVariants = cva(
   }
 );
 
-const icons = {
+/* ============================= */
+/* move outside component so it’s not recreated */
+/* ============================= */
+
+const ICONS = {
   error: AlertErrorIcon,
   success: AlertSuccessIcon,
   warning: AlertWarningIcon,
-};
+} as const;
 
 type AlertProps =
   HTMLAttributes<HTMLDivElement> &
   VariantProps<typeof alertVariants> & {
-    title: ReactNode;
-    description: ReactNode;
+    title?: ReactNode;
+    children?: ReactNode;
   };
+
+/* ============================= */
+/* component */
+/* ============================= */
 
 export function Alert({
   className,
   variant = "error",
   title,
-  description,
+  children,
   ...props
 }: AlertProps) {
-  const IconComponent = icons[variant!];
+  const Icon = ICONS[variant ?? "error"];
 
   return (
     <div
       role="alert"
-      aria-live="polite"
       className={cn(alertVariants({ variant }), className)}
       {...props}
     >
-      <IconComponent />
+      <Icon className="w-5 h-5 shrink-0 mt-0.5" />
 
-      <div className="w-full">
-        <h5
-          className={cn("mb-4 font-bold leading-[22px]", {
-            "text-[#004434] dark:text-[#34D399]": variant === "success",
-            "text-[#9D5425]": variant === "warning",
-            "text-[#BC1C21]": variant === "error",
-          })}
-        >
-          {title}
-        </h5>
-
-        <div
-          className={cn({
-            "text-[#637381]": variant === "success",
-            "text-[#D0915C]": variant === "warning",
-            "text-[#CD5D5D]": variant === "error",
-          })}
-        >
-          {description}
+      {(title || children) && (
+        <div className="space-y-1">
+          {title && <div className="font-semibold">{title}</div>}
+          {children && <div className="opacity-90">{children}</div>}
         </div>
-      </div>
+      )}
     </div>
   );
 }

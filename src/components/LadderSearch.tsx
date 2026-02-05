@@ -1,9 +1,16 @@
 "use client";
-export const dynamic = "force-dynamic";
+
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 
 const PAGE_SIZE = 50;
+
+/* stable helper (not recreated each render) */
+const normalize = (s: string) =>
+  s.replace(/\s+/g, "").toLowerCase();
+
+const INPUT_BASE =
+  "w-full max-w-xs rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 dark:border-gray-700 dark:bg-gray-800";
 
 export default function LadderSearch({
   rows,
@@ -16,18 +23,29 @@ export default function LadderSearch({
   const [q, setQ] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  function normalize(s: string) {
-    return s.replace(/\s+/g, "").toLowerCase();
-  }
+  /* =====================================================
+     precompute once
+     store BOTH normalized + original index
+  ===================================================== */
 
-  function runSearch() {
+  const normalizedRows = useMemo(
+    () =>
+      rows.map((r) => ({
+        norm: normalize(r.battletag),
+      })),
+    [rows]
+  );
+
+  /* ===================================================== */
+
+  const runSearch = useCallback(() => {
     const query = q.trim();
     if (!query) return;
 
     const qNorm = normalize(query);
 
-    const idx = rows.findIndex((r) =>
-      normalize(r.battletag).includes(qNorm)
+    const idx = normalizedRows.findIndex((r) =>
+      r.norm.includes(qNorm)
     );
 
     if (idx === -1) {
@@ -42,7 +60,11 @@ export default function LadderSearch({
     router.push(
       `${base}?page=${page}&highlight=${encodeURIComponent(query)}`
     );
-  }
+
+    setQ("");
+  }, [q, normalizedRows, router, base]);
+
+  /* ===================================================== */
 
   return (
     <div className="mb-4 space-y-1">
@@ -59,18 +81,11 @@ export default function LadderSearch({
           }
         }}
         placeholder="Find player in ladder..."
-        className="
-          w-full max-w-xs rounded-lg border border-gray-300
-          bg-white px-3 py-2 text-sm
-          focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500
-          dark:border-gray-700 dark:bg-gray-800
-        "
+        className={INPUT_BASE}
       />
 
       {error && (
-        <div className="text-xs text-red-500">
-          {error}
-        </div>
+        <div className="text-xs text-red-500">{error}</div>
       )}
     </div>
   );

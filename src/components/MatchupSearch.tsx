@@ -1,9 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useState, useTransition, useCallback } from "react";
 import BattleTagInput from "@/components/BattleTagInput";
 import LoadingSpinner from "@/components/LoadingSpinner";
+
+const FORM_BASE =
+  "flex gap-2 max-w-xl rounded-xl border bg-white dark:bg-gray-900 p-4 shadow-sm mt-6";
 
 export default function MatchupSearch({
   initialA,
@@ -14,35 +17,33 @@ export default function MatchupSearch({
 }) {
   const router = useRouter();
 
-  const [a, setA] = useState(initialA ?? "");
-  const [b, setB] = useState(initialB ?? "");
+  /* initialize once — no syncing effects */
+  const [a, setA] = useState(() => initialA ?? "");
+  const [b, setB] = useState(() => initialB ?? "");
 
-  const [pending, startTransition] = useTransition(); // ← key
+  const [pending, startTransition] = useTransition();
 
-  useEffect(() => setA(initialA ?? ""), [initialA]);
-  useEffect(() => setB(initialB ?? ""), [initialB]);
+  const run = useCallback(
+    (e?: React.FormEvent) => {
+      e?.preventDefault();
 
-  function run(e?: React.FormEvent) {
-    e?.preventDefault();
+      const A = a.trim();
+      const B = b.trim();
 
-    const A = a.trim();
-    const B = b.trim();
+      if (!A || !B) return;
 
-    if (!A || !B) return;
-
-    startTransition(() => {
-      router.push(
-        `/stats/matchup?a=${encodeURIComponent(A)}&b=${encodeURIComponent(B)}`
-      );
-    });
-  }
+      startTransition(() => {
+        router.push(
+          `/stats/matchup?a=${encodeURIComponent(A)}&b=${encodeURIComponent(B)}`
+        );
+      });
+    },
+    [a, b, router, startTransition]
+  );
 
   return (
     <>
-      <form
-        onSubmit={run}
-        className="flex gap-2 max-w-xl rounded-xl border bg-white dark:bg-gray-900 p-4 shadow-sm mt-6"
-      >
+      <form onSubmit={run} className={FORM_BASE}>
         <BattleTagInput value={a} onChange={setA} placeholder="Player A" />
         <BattleTagInput value={b} onChange={setB} placeholder="Player B" />
 

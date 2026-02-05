@@ -140,12 +140,13 @@ export default function PlayerLandingPage() {
 
         <div className="space-y-2">
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-black dark:text-white">
-            KD’s W3Champions Stats
+            KD's W3Champions Stats
           </h1>
 
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Strength of Schedule Ladder • 8 Detailed Stat Reports • 4v4 coming soon
-          </p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+          Strength of Schedule Ladder<br />
+          Detailed Player Stats
+         </p>
         </div>
 
         <div className="space-y-6 rounded-2xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-md p-6">

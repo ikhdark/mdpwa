@@ -1,6 +1,11 @@
 "use client";
 
+import { useCallback, useMemo } from "react";
 import { useBattleTagAutocomplete } from "@/hooks/useBattleTagAutocomplete";
+
+const INPUT_BASE = "border rounded px-3 py-2 w-full";
+const DROPDOWN_BASE =
+  "absolute z-50 mt-1 w-full bg-white border rounded shadow";
 
 export default function BattleTagInput({
   value,
@@ -13,36 +18,73 @@ export default function BattleTagInput({
 }) {
   const { results, clear } = useBattleTagAutocomplete(value);
 
+  /* =========================
+     derived once
+  ========================= */
+
+  const visible = useMemo(() => results.slice(0, 6), [results]);
+
+  /* =========================
+     stable handlers
+  ========================= */
+
+  const handleChange = useCallback(
+    (v: string) => {
+      onChange(v);
+      clear();
+    },
+    [onChange, clear]
+  );
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "Enter" && visible.length > 0) {
+        e.preventDefault();
+        onChange(visible[0].battleTag);
+        clear();
+      }
+    },
+    [visible, onChange, clear]
+  );
+
+  const select = useCallback(
+    (tag: string) => {
+      onChange(tag);
+      clear();
+    },
+    [onChange, clear]
+  );
+
+  /* ========================= */
+
   return (
     <div className="relative w-full">
       <input
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => handleChange(e.target.value)}
+        onKeyDown={handleKeyDown}
         placeholder={placeholder}
-        className="border rounded px-3 py-2 w-full"
+        className={INPUT_BASE}
         autoComplete="off"
         spellCheck={false}
         autoCorrect="off"
         autoCapitalize="none"
       />
 
-{results.length > 0 && (
-  <div className="absolute z-20 mt-1 w-full bg-white border rounded shadow">
-    {results.slice(0, 6).map((r) => (
-      <button
-        key={r.battleTag}
-        type="button"
-        onClick={() => {
-          onChange(r.battleTag);
-          clear();
-        }}
-        className="block w-full px-3 py-2 hover:bg-gray-100 text-sm text-left"
-      >
-        {r.battleTag}
-      </button>
-    ))}
-  </div>
-)}
+      {visible.length > 0 && (
+        <div className={DROPDOWN_BASE}>
+          {visible.map((r) => (
+            <button
+              key={r.battleTag}
+              type="button"
+              onClick={() => select(r.battleTag)}
+              className="block w-full px-3 py-2 hover:bg-gray-100 text-sm text-left"
+            >
+              {r.battleTag}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

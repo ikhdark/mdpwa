@@ -1,23 +1,38 @@
-import React, { ReactNode } from "react";
+import type { ReactNode, HTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
+
+/* =========================================
+   shared base styles (avoid re-allocations)
+========================================= */
+
+const CARD_BASE =
+  "rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-md overflow-hidden";
+
+const SECTION_BASE = `${CARD_BASE} p-5 space-y-4`;
+
+const STATCARD_BASE =
+  `${CARD_BASE} transition-shadow hover:shadow-lg`;
 
 /* =========================
    Header
 ========================= */
 
-type PlayerHeaderProps = {
+type PlayerHeaderProps = HTMLAttributes<HTMLElement> & {
   battletag: string;
   subtitle: string;
-  className?: string;
 };
 
 export function PlayerHeader({
   battletag,
   subtitle,
   className,
+  ...props
 }: PlayerHeaderProps) {
   return (
-    <header className={cn("space-y-2", className)}>
+    <header
+      className={className ? cn("space-y-2", className) : "space-y-2"}
+      {...props}
+    >
       <h1 className="truncate text-3xl font-semibold tracking-tight text-black dark:text-white">
         {battletag}
       </h1>
@@ -30,29 +45,24 @@ export function PlayerHeader({
 }
 
 /* =========================
-   Section (now a real card)
+   Section
 ========================= */
 
-type SectionProps = {
+type SectionProps = HTMLAttributes<HTMLElement> & {
   title: string;
   children: ReactNode;
-  className?: string;
 };
 
-export function Section({ title, children, className }: SectionProps) {
+export function Section({
+  title,
+  children,
+  className,
+  ...props
+}: SectionProps) {
   return (
     <section
-      className={cn(
-        `
-        space-y-4
-        rounded-xl
-        border border-gray-300 dark:border-gray-700
-        bg-white dark:bg-gray-900
-        shadow-md
-        p-5
-        `,
-        className
-      )}
+      className={className ? cn(SECTION_BASE, className) : SECTION_BASE}
+      {...props}
     >
       <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
         {title}
@@ -67,11 +77,10 @@ export function Section({ title, children, className }: SectionProps) {
    Stat Row
 ========================= */
 
-type StatRowProps = {
+type StatRowProps = HTMLAttributes<HTMLDivElement> & {
   label: string;
   value: string | number;
   winrate?: number;
-  className?: string;
 };
 
 export function StatRow({
@@ -79,6 +88,7 @@ export function StatRow({
   value,
   winrate,
   className,
+  ...props
 }: StatRowProps) {
   const pct =
     typeof winrate === "number"
@@ -95,7 +105,10 @@ export function StatRow({
       : "text-rose-600 dark:text-rose-400";
 
   return (
-    <div className={cn("space-y-1", className)}>
+    <div
+      className={className ? cn("space-y-1", className) : "space-y-1"}
+      {...props}
+    >
       <div className="grid grid-cols-[1fr_auto] items-center gap-x-4">
         <span className="truncate text-gray-700 dark:text-gray-300">
           {label}
@@ -109,14 +122,13 @@ export function StatRow({
       {pct !== null && (
         <div className="h-1.5 overflow-hidden rounded bg-gray-200 dark:bg-gray-700">
           <div
-            className={cn(
-              "h-full transition-all",
+            className={
               pct >= 55
-                ? "bg-emerald-500"
+                ? "h-full transition-all bg-emerald-500"
                 : pct >= 48
-                ? "bg-yellow-500"
-                : "bg-rose-500"
-            )}
+                ? "h-full transition-all bg-yellow-500"
+                : "h-full transition-all bg-rose-500"
+            }
             style={{ width: `${pct}%` }}
           />
         </div>
@@ -126,14 +138,13 @@ export function StatRow({
 }
 
 /* =========================
-   Stat Card (more defined)
+   Stat Card
 ========================= */
 
-type StatCardProps = {
+type StatCardProps = HTMLAttributes<HTMLDivElement> & {
   label: string;
   value: string | number;
   sub?: ReactNode;
-  className?: string;
   compact?: boolean;
 };
 
@@ -141,22 +152,18 @@ export function StatCard({
   label,
   value,
   sub,
-  className,
   compact,
+  className,
+  ...props
 }: StatCardProps) {
   return (
     <div
-      className={cn(
-        `
-        rounded-xl
-        border border-gray-300 dark:border-gray-700
-        bg-white dark:bg-gray-900
-        shadow-md hover:shadow-lg
-        transition-shadow
-        `,
-        compact ? "p-3" : "p-5",
+      className={
         className
-      )}
+          ? cn(STATCARD_BASE, compact ? "p-3" : "p-5", className)
+          : `${STATCARD_BASE} ${compact ? "p-3" : "p-5"}`
+      }
+      {...props}
     >
       <div className="text-xs uppercase tracking-wide text-gray-500">
         {label}
