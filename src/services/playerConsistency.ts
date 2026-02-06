@@ -2,6 +2,7 @@
 
 import { resolveBattleTagViaSearch } from "@/lib/w3cBattleTagResolver";
 import { fetchAllMatches, getPlayerAndOpponent } from "@/lib/w3cUtils";
+import { cache, inflight } from "@/lib/cache";
 
 /* =========================
    CONSTANTS
@@ -31,144 +32,160 @@ export async function getPlayerConsistency(input: string) {
   );
   if (!battletag) return null;
 
-  /* ---------- fetch (NO LOCAL CACHE) ---------- */
+  const key = `playerConsistency:${battletag}:${SEASON}`;
 
-  const allMatches = await fetchAllMatches(battletag, [SEASON]);
-  if (!allMatches.length) return null;
+  const cached = cache.get<any>(key);
+  if (cached) return cached;
 
-  /* ---------- pre-filter FIRST (faster) ---------- */
+  if (inflight.has(key)) return inflight.get(key)!;
 
-  const matches = allMatches
-    .filter(
-      (m: any) =>
-        m.gameMode === 1 &&
-        m.durationInSeconds >= MIN_DURATION_SECONDS
-    )
-    .sort(
-      (a: any, b: any) =>
-        Date.parse(a.startTime) - Date.parse(b.startTime)
-    );
+  const promise = (async () => {
+    try {
+      /* ---------- fetch (NO LOCAL CACHE) ---------- */
 
-  /* ---------- accumulators ---------- */
+      const allMatches = await fetchAllMatches(battletag, [SEASON]);
+      if (!allMatches.length) return null;
 
-  let wins = 0;
-  let losses = 0;
+      /* ---------- pre-filter FIRST (faster) ---------- */
 
-  let longestWin = 0;
-  let longestLoss = 0;
-  let current = 0;
+      const matches = allMatches
+        .filter(
+          (m: any) =>
+            m.gameMode === 1 &&
+            m.durationInSeconds >= MIN_DURATION_SECONDS
+        )
+        .sort(
+          (a: any, b: any) =>
+            Date.parse(a.startTime) - Date.parse(b.startTime)
+        );
 
-  let lastTime = 0;
+      /* ---------- accumulators ---------- */
 
-  const sessions: {
-    start: string;
-    games: number;
-    wins: number;
-  }[] = [];
+      let wins = 0;
+      let losses = 0;
 
-  let session: {
-    start: string;
-    games: number;
-    wins: number;
-  } | null = null;
+      let longestWin = 0;
+      let longestLoss = 0;
+      let current = 0;
 
-  const recentResults: boolean[] = [];
-  const simpleMatches: { startTime: string; didWin: boolean }[] = [];
+      let lastTime = 0;
 
-  /* ---------- single pass ---------- */
+      const sessions: {
+        start: string;
+        games: number;
+        wins: number;
+      }[] = [];
 
-  for (const m of matches) {
-    const pair = getPlayerAndOpponent(m, battletag);
-    if (!pair) continue;
+      let session: {
+        start: string;
+        games: number;
+        wins: number;
+      } | null = null;
 
-    const didWin = !!pair.me?.won;
+      const recentResults: boolean[] = [];
+      const simpleMatches: { startTime: string; didWin: boolean }[] = [];
 
-    simpleMatches.push({
-      startTime: m.startTime,
-      didWin,
-    });
+      /* ---------- single pass ---------- */
 
-    /* totals */
-    if (didWin) wins++;
-    else losses++;
+      for (const m of matches) {
+        const pair = getPlayerAndOpponent(m, battletag);
+        if (!pair) continue;
 
-    /* streaks */
-    if (didWin) {
-      current = current >= 0 ? current + 1 : 1;
-      if (current > longestWin) longestWin = current;
-    } else {
-      current = current <= 0 ? current - 1 : -1;
-      const abs = Math.abs(current);
-      if (abs > longestLoss) longestLoss = abs;
-    }
+        const didWin = !!pair.me?.won;
 
-    /* sessions */
-    const time = Date.parse(m.startTime);
+        simpleMatches.push({
+          startTime: m.startTime,
+          didWin,
+        });
 
-    if (!session || time - lastTime > SESSION_GAP_MS) {
+        /* totals */
+        if (didWin) wins++;
+        else losses++;
+
+        /* streaks */
+        if (didWin) {
+          current = current >= 0 ? current + 1 : 1;
+          if (current > longestWin) longestWin = current;
+        } else {
+          current = current <= 0 ? current - 1 : -1;
+          const abs = Math.abs(current);
+          if (abs > longestLoss) longestLoss = abs;
+        }
+
+        /* sessions */
+        const time = Date.parse(m.startTime);
+
+        if (!session || time - lastTime > SESSION_GAP_MS) {
+          if (session) sessions.push(session);
+
+          session = {
+            start: new Date(time).toISOString(),
+            games: 0,
+            wins: 0,
+          };
+        }
+
+        session.games++;
+        if (didWin) session.wins++;
+
+        lastTime = time;
+
+        /* recent ring buffer (max 50) */
+        recentResults.push(didWin);
+        if (recentResults.length > 50) recentResults.shift();
+      }
+
       if (session) sessions.push(session);
 
-      session = {
-        start: new Date(time).toISOString(),
-        games: 0,
-        wins: 0,
+      /* ---------- derived ---------- */
+
+      const totalGames = wins + losses;
+
+      const last10 = recentResults.slice(-10);
+      const last25 = recentResults.slice(-25);
+      const last50 = recentResults.slice(-50);
+
+      const result = {
+        battletag,
+
+        totals: {
+          games: totalGames,
+          wins,
+          losses,
+          winrate: wr(wins, totalGames),
+        },
+
+        streaks: {
+          longestWin,
+          longestLoss,
+          current,
+        },
+
+        sessionCount: sessions.length,
+
+        sessions: sessions.map((s) => ({
+          start: s.start,
+          games: s.games,
+          wins: s.wins,
+          losses: s.games - s.wins,
+        })),
+
+        recent: {
+          last10: wr(countWins(last10), last10.length),
+          last25: wr(countWins(last25), last25.length),
+          last50: wr(countWins(last50), last50.length),
+        },
+
+        matches: simpleMatches,
       };
+
+      cache.set(key, result, 60_000); // 60s TTL
+      return result;
+    } finally {
+      inflight.delete(key);
     }
+  })();
 
-    session.games++;
-    if (didWin) session.wins++;
-
-    lastTime = time;
-
-    /* recent ring buffer (max 50) */
-    recentResults.push(didWin);
-    if (recentResults.length > 50) recentResults.shift();
-  }
-
-  if (session) sessions.push(session);
-
-  /* ---------- derived ---------- */
-
-  const totalGames = wins + losses;
-
-  const last10 = recentResults.slice(-10);
-  const last25 = recentResults.slice(-25);
-  const last50 = recentResults.slice(-50);
-
-  /* ---------- return ---------- */
-
-  return {
-    battletag,
-
-    totals: {
-      games: totalGames,
-      wins,
-      losses,
-      winrate: wr(wins, totalGames),
-    },
-
-    streaks: {
-      longestWin,
-      longestLoss,
-      current,
-    },
-
-    sessionCount: sessions.length,
-
-    sessions: sessions.map((s) => ({
-      start: s.start,
-      games: s.games,
-      wins: s.wins,
-      losses: s.games - s.wins,
-    })),
-
-    recent: {
-      last10: wr(countWins(last10), last10.length),
-      last25: wr(countWins(last25), last25.length),
-      last50: wr(countWins(last50), last50.length),
-    },
-
-    // timezone-neutral, client builds heatmap
-    matches: simpleMatches,
-  };
+  inflight.set(key, promise);
+  return promise;
 }

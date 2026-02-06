@@ -152,8 +152,8 @@ export async function getW3CCountryStats(
   const raw = safeDecode(String(inputBattletag ?? "")).trim();
   if (!raw) return null;
 
-const canonicalTag =
-  (await resolveBattleTagViaSearch(raw)) || raw;
+const canonicalTag = await resolveBattleTagViaSearch(raw);
+if (!canonicalTag) return null;
 
   const profile = await fetchPlayerProfile(canonicalTag);
 
@@ -161,11 +161,7 @@ const canonicalTag =
 
   let homeCountry = resolveCountryFromProfile(profile);
 
-// matches: try canonical first, then lowercase fallback (some endpoints behave that way)
 const matches = await fetchAllMatches(canonicalTag, SEASONS);
-
-
-// TEMP: do NOT early-return
 
   // Fallback: infer home country from YOUR match rows (majority vote)
 if (!homeCountry) {

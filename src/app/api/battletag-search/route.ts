@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { cache, inflight } from "@/lib/cache";
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -8,12 +9,34 @@ export async function GET(req: Request) {
     return NextResponse.json([]);
   }
 
-  const res = await fetch(
-    `https://website-backend.w3champions.com/api/players/global-search?search=${encodeURIComponent(q)}`,
-    { cache: "no-store" }
-  );
+  const key = `global-search:${q.toLowerCase()}`;
 
-  const json = await res.json();
+  const cached = cache.get<any[]>(key);
+  if (cached) return NextResponse.json(cached);
 
-  return NextResponse.json(json ?? []);
+  if (inflight.has(key)) {
+    const hit = await inflight.get(key)!;
+    return NextResponse.json(hit);
+  }
+
+  const promise = (async () => {
+    try {
+      const res = await fetch(
+        `https://website-backend.w3champions.com/api/players/global-search?search=${encodeURIComponent(q)}`,
+        { cache: "no-store" }
+      );
+
+      const json = (await res.json()) ?? [];
+
+      cache.set(key, json, 30_000); // 30s TTL (good for autocomplete)
+      return json;
+    } finally {
+      inflight.delete(key);
+    }
+  })();
+
+  inflight.set(key, promise);
+
+  const result = await promise;
+  return NextResponse.json(result);
 }

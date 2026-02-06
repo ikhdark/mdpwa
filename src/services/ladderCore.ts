@@ -12,6 +12,8 @@ import {
   type LadderInputRow,
 } from "@/lib/ladderEngine";
 
+import { cache, inflight } from "@/lib/cache";
+
 /* =========================
    CONFIG
 ========================= */
@@ -31,22 +33,41 @@ const SOS_CONCURRENCY = 25;
 ========================= */
 
 export async function fetchAllLeagues() {
-  const urls: string[] = [];
+  const key = `fetchAllLeagues:${SEASON}:${GAME_MODE}:${GATEWAY}`;
 
-  for (let league = MIN_LEAGUE; league <= MAX_LEAGUE; league++) {
-    urls.push(
-      `https://website-backend.w3champions.com/api/ladder/${league}` +
-        `?gateWay=${GATEWAY}` +
-        `&gameMode=${GAME_MODE}` +
-        `&season=${SEASON}`
-    );
-  }
+  const cached = cache.get<any[]>(key);
+  if (cached) return cached;
 
-  const results = await Promise.all(
-    urls.map(async (url) => (await fetchJson<any[]>(url)) ?? [])
-  );
+  if (inflight.has(key)) return inflight.get(key)!;
 
-  return flattenCountryLadder(results.flat());
+  const promise = (async () => {
+    try {
+      const urls: string[] = [];
+
+      for (let league = MIN_LEAGUE; league <= MAX_LEAGUE; league++) {
+        urls.push(
+          `https://website-backend.w3champions.com/api/ladder/${league}` +
+            `?gateWay=${GATEWAY}` +
+            `&gameMode=${GAME_MODE}` +
+            `&season=${SEASON}`
+        );
+      }
+
+      const results = await Promise.all(
+        urls.map(async (url) => (await fetchJson<any[]>(url)) ?? [])
+      );
+
+      const flattened = flattenCountryLadder(results.flat());
+
+      cache.set(key, flattened, 60_000); // 60s TTL
+      return flattened;
+    } finally {
+      inflight.delete(key);
+    }
+  })();
+
+  inflight.set(key, promise);
+  return promise;
 }
 
 /* =========================
