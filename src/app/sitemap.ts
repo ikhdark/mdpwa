@@ -1,15 +1,14 @@
 import { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = "https://martindale.app";
-  const now = new Date();
+  const base = "https://martindaletx.app";
 
   return [
-    { url: base, lastModified: now },
-    { url: `${base}/services`, lastModified: now },
-    { url: `${base}/government`, lastModified: now },
-    { url: `${base}/forms`, lastModified: now },
-    { url: `${base}/community`, lastModified: now },
-    { url: `${base}/media`, lastModified: now },
+    {
+      url: base,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 1,
+    },
   ];
 }
