@@ -5,7 +5,7 @@ import Sidebar from "@/components/Layouts/sidebar";
 import { Header } from "@/components/Layouts/header";
 import InstallBanner from "@/components/InstallBanner";
 import PWARegister from "./pwa-register";
-
+import Script from "next/script";
 import type { Metadata, Viewport } from "next";
 import type { PropsWithChildren } from "react";
 import { Providers } from "./providers";
@@ -35,7 +35,19 @@ export default function RootLayout({ children }: PropsWithChildren) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="bg-surface-50 font-sans antialiased">
+  <Script
+    src="https://www.googletagmanager.com/gtag/js?id=G-1QQKTE3RYJ"
+    strategy="afterInteractive"
+  />
 
+  <Script id="ga-init" strategy="afterInteractive">
+    {`
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-1QQKTE3RYJ');
+    `}
+  </Script>
         <Providers>
 
           <PWARegister />
