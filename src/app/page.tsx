@@ -1,5 +1,8 @@
+"use client";
+
 import LocalCalendar from "@/components/LocalCalendar";
 import Link from "next/link";
+import { useSidebarContext } from "@/components/Layouts/sidebar/sidebar-context";
 
 function Card({
   href,
@@ -46,10 +49,28 @@ function Section({
 }
 
 export default function Page() {
-  return (
-    <main className="max-w-3xl mx-auto p-6 space-y-10">
+  const { toggleSidebar } = useSidebarContext();
 
-      <h1 className="text-2xl font-semibold">City of Martindale</h1>
+  return (
+    <main className="max-w-3xl mx-auto p-6 space-y-8">
+
+      {/* BIG PRIMARY BUTTON */}
+      <button
+  onClick={toggleSidebar}
+  className="
+    w-full
+    py-2
+    text-lg font-bold
+    rounded-xl
+    bg-green-600
+    text-white
+    hover:bg-green-700
+    shadow-md
+  "
+>
+  Tap for Services & Information
+</button>
+
 
       {/* EVENTS */}
       <Section title="This Week">
@@ -70,8 +91,6 @@ export default function Page() {
             src="https://www.youtube.com/embed/videoseries?list=UUTzqMkR23XbeorS__nD_mVw"
             title="City of Martindale Meeting Recordings"
             loading="lazy"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerPolicy="strict-origin-when-cross-origin"
             allowFullScreen
           />
         </div>

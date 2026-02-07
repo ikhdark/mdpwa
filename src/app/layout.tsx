@@ -1,15 +1,30 @@
 import "./globals.css";
 import "@/css/satoshi.css";
 import "@/css/style.css";
-import Sidebar from "@/components/Layouts/sidebar";
-import { Header } from "@/components/Layouts/header";
+
+import type { Metadata } from "next";
+import type { PropsWithChildren } from "react";
+
+import { Providers } from "./providers";
+import Analytics from "@/components/Analytics";
 import InstallBanner from "@/components/InstallBanner";
 import PWARegister from "./pwa-register";
 import Script from "next/script";
-import type { Metadata } from "next";
-import type { PropsWithChildren } from "react";
-import { Providers } from "./providers";
-import Analytics from "@/components/Analytics";
+
+import { Header } from "@/components/Layouts/header";
+
+/* ✅ Sidebar (CRITICAL) */
+import Sidebar from "@/components/Layouts/sidebar";
+import { SidebarProvider } from "@/components/Layouts/sidebar/sidebar-context";
+
+/* ✅ Google Font */
+import { Public_Sans } from "next/font/google";
+
+const publicSans = Public_Sans({
+  subsets: ["latin"],
+  weight: ["400", "600", "700"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: {
@@ -18,52 +33,43 @@ export const metadata: Metadata = {
   },
   description: "Official city services and information portal",
   manifest: "/manifest.json",
-  icons: {
-    icon: [
-      { url: "/favicon.ico" },
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-    ],
-    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
-  },
 };
 
 export default function RootLayout({ children }: PropsWithChildren) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="bg-surface-50 font-sans antialiased">
+      <body className={`${publicSans.className} bg-surface-50 antialiased`}>
 
-        {/* ✅ Google Analytics — correct placement */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-1QQKTE3RY3"
           strategy="afterInteractive"
         />
-        <Script id="ga-init" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-1QQKTE3RY3');
-          `}
-        </Script>
 
         <Providers>
           <Analytics />
           <PWARegister />
           <InstallBanner />
 
-          <div className="flex min-h-screen">
-            <Sidebar />
+          {/* 🔴 THIS WAS MISSING */}
+          <SidebarProvider>
+            <div className="flex min-h-screen">
 
-            <div className="flex w-full flex-col">
-              <Header />
-              <main className="flex-1 w-full p-4 md:p-6 pb-20 pb-safe">
-                {children}
-              </main>
+              {/* actual sidebar */}
+              <Sidebar />
+
+              {/* page area */}
+              <div className="flex flex-1 flex-col">
+                <Header />
+
+                <main className="flex-1 w-full p-4 md:p-6 pb-20 pb-safe">
+                  {children}
+                </main>
+              </div>
+
             </div>
-          </div>
-        </Providers>
+          </SidebarProvider>
 
+        </Providers>
       </body>
     </html>
   );

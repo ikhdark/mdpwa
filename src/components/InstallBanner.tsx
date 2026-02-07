@@ -31,24 +31,24 @@ export default function InstallBanner() {
 
   if (!visible) return null;
 
-  return (
-    <div className="fixed bottom-16 left-1/2 -translate-x-1/2 z-50">
-      <button
-        onClick={install}
-        className="
-          bg-[#14b8a6] text-white
-          text-lg font-semibold
-          px-7 py-3
-          rounded-2xl
-          shadow-lg
-          hover:bg-[#0f766e]
-          hover:shadow-xl hover:scale-105
-          active:scale-95
-          transition
-        "
-      >
-        Install App
-      </button>
-    </div>
-  );
+return (
+  <div className="fixed bottom-16 left-1/2 -translate-x-1/2 z-50">
+    <button
+      onClick={install}
+      className="
+        bg-green-500 text-white
+        text-md font-semibold
+        px-7 py-4
+        rounded-2xl
+        shadow-lg
+        hover:bg-green-700
+        hover:shadow-xl hover:scale-100
+        active:scale-95
+        transition
+      "
+    >
+      Tap to Install App
+    </button>
+  </div>
+);
 }

@@ -34,16 +34,15 @@ export default function Sidebar() {
         <div className="p-4 space-y-6">
           {NAV_DATA.map((group) => (
             <div key={group.label}>
-              <p className="px-4 mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+              {/* ✅ bold + underline divider */}
+              <p className="px-4 mb-3 pb-2 text-sm font-bold uppercase tracking-wide text-slate-700 border-b border-slate-400">
                 {group.label}
               </p>
 
-              <div className="space-y-1">
+              <div className="space-y-1 mt-2">
                 {group.items.map((item) => {
                   const href: string = item.url || `/${item.path || ""}`;
-
-                  const active =
-                    !!item.path && pathname === href;
+                  const active = !!item.path && pathname === href;
 
                   return (
                     <MenuItem
