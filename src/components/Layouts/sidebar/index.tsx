@@ -11,39 +11,39 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* overlay */}
+      {/* mobile backdrop */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/40 md:hidden"
+          className="fixed inset-0 z-40 bg-black/50 md:hidden"
           onClick={closeSidebar}
         />
       )}
 
-      {/* drawer */}
       <aside
         className={`
           fixed md:static
           left-0 top-0 z-50
           w-72 h-screen
-          bg-white border-r
+          bg-white
+          border-r border-slate-200
           overflow-y-auto
           transition-transform
           ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
         `}
       >
         <div className="p-4 space-y-6">
-
           {NAV_DATA.map((group) => (
             <div key={group.label}>
-
-              <p className="px-4 mb-2 text-xs font-semibold uppercase text-slate-500">
+              <p className="px-4 mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
                 {group.label}
               </p>
 
               <div className="space-y-1">
                 {group.items.map((item) => {
-                  const href = item.path ? `/${item.path}` : "/";
-                  const active = pathname === href;
+                  const href: string = item.url || `/${item.path || ""}`;
+
+                  const active =
+                    !!item.path && pathname === href;
 
                   return (
                     <MenuItem
@@ -57,10 +57,8 @@ export default function Sidebar() {
                   );
                 })}
               </div>
-
             </div>
           ))}
-
         </div>
       </aside>
     </>

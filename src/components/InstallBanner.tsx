@@ -1,41 +1,52 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function InstallBanner() {
-  const [prompt, setPrompt] = useState<any>(null);
+  const deferredPrompt = useRef<any>(null);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     function handler(e: any) {
-      e.preventDefault();
-      setPrompt(e);
+      e.preventDefault();           // suppress Chrome banner
+      deferredPrompt.current = e;   // store safely
       setVisible(true);
     }
 
     window.addEventListener("beforeinstallprompt", handler);
-    return () => window.removeEventListener("beforeinstallprompt", handler);
+    return () =>
+      window.removeEventListener("beforeinstallprompt", handler);
   }, []);
 
-  if (!visible) return null;
-
   async function install() {
+    const prompt = deferredPrompt.current;
     if (!prompt) return;
 
-    prompt.prompt();
+    prompt.prompt();                // REQUIRED
     await prompt.userChoice;
+
+    deferredPrompt.current = null;  // clear
     setVisible(false);
   }
 
+  if (!visible) return null;
+
   return (
-    <div
-      className="
-        fixed bottom-16 left-1/2 -translate-x-1/2 z-50
-        rounded-xl bg-brand text-white
-        px-4 py-2 text-sm shadow-lg
-      "
-    >
-      <button onClick={install}>
+    <div className="fixed bottom-16 left-1/2 -translate-x-1/2 z-50">
+      <button
+        onClick={install}
+        className="
+          bg-[#14b8a6] text-white
+          text-lg font-semibold
+          px-7 py-3
+          rounded-2xl
+          shadow-lg
+          hover:bg-[#0f766e]
+          hover:shadow-xl hover:scale-105
+          active:scale-95
+          transition
+        "
+      >
         Install App
       </button>
     </div>

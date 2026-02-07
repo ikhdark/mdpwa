@@ -1,14 +1,12 @@
+import "./globals.css";
 import "@/css/satoshi.css";
 import "@/css/style.css";
-
 import Sidebar from "@/components/Layouts/sidebar";
 import { Header } from "@/components/Layouts/header";
-
-import BottomNav from "@/components/BottomNav";
 import InstallBanner from "@/components/InstallBanner";
 import PWARegister from "./pwa-register";
 
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { PropsWithChildren } from "react";
 import { Providers } from "./providers";
 
@@ -18,6 +16,12 @@ export const metadata: Metadata = {
     default: "City of Martindale",
   },
   description: "Official city services and information portal",
+
+  manifest: "/manifest.json" // keep here
+};
+
+export const viewport: Viewport = {
+  themeColor: "#000000" // ← moved here (required by Next)
 };
 
 export default function RootLayout({ children }: PropsWithChildren) {
@@ -27,36 +31,23 @@ export default function RootLayout({ children }: PropsWithChildren) {
 
         <Providers>
 
-          {/* register service worker (offline support) */}
           <PWARegister />
-
-          {/* install banner (PWA prompt) */}
           <InstallBanner />
 
           <div className="flex min-h-screen">
 
-            {/* ================= DESKTOP SIDEBAR ================= */}
             <Sidebar />
 
-            {/* ================= MAIN COLUMN ================= */}
             <div className="flex w-full flex-col">
 
               <Header />
 
-              {/*
-                IMPORTANT:
-                pb-20 -> space for mobile bottom nav
-                pb-safe -> iOS notch safe area
-              */}
-              <main className="flex-1 mx-auto w-full max-w-screen-2xl p-4 md:p-6 2xl:p-10 pb-20 pb-safe">
+              <main className="flex-1 w-full p-4 md:p-6 pb-20 pb-safe">
                 {children}
               </main>
 
             </div>
           </div>
-
-          {/* ================= MOBILE BOTTOM NAV ================= */}
-          <BottomNav />
 
         </Providers>
 

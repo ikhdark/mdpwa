@@ -1,94 +1,91 @@
+import LocalCalendar from "@/components/LocalCalendar";
 import Link from "next/link";
 
-export default function Home() {
-  const card = `
-    group
-    flex items-center justify-between
-    rounded-xl
-    bg-white
-    border border-surface-200
-    px-6 py-5
-
-    text-slate-900 font-medium
-
-    shadow-card
-    transition-all duration-150
-
-    hover:-translate-y-0.5
-    hover:shadow-cardHover
-    hover:border-slate-300
-    active:scale-[0.98]
-  `;
-
-  const arrow = `
-    text-slate-400
-    group-hover:text-brand
-    transition
-  `;
-
+function Card({
+  href,
+  children,
+}: {
+  href: string;
+  children: React.ReactNode;
+}) {
   return (
-    <main className="min-h-screen bg-surface-50 max-w-md mx-auto p-4">
+    <Link
+      href={href}
+      className="
+        block
+        rounded-xl
+        border
+        bg-white
+        px-5 py-4
+        shadow-sm
+        hover:shadow-md
+        transition
+        font-medium
+      "
+    >
+      {children}
+    </Link>
+  );
+}
 
-      {/* HEADER */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-slate-900">
-          Martindale
-        </h1>
-        <p className="text-sm text-slate-500">
-          City Services
-        </p>
-      </div>
+function Section({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="space-y-3">
+      <h2 className="text-xs font-semibold uppercase text-slate-500">
+        {title}
+      </h2>
+      <div className="grid gap-3 sm:grid-cols-2">{children}</div>
+    </section>
+  );
+}
 
-      {/* LIST STYLE (cleaner than tiles) */}
-      <div className="space-y-3">
+export default function Page() {
+  return (
+    <main className="max-w-3xl mx-auto p-6 space-y-10">
 
-        <Link href="/services/pay" className={card}>
-          <span>Pay Utility Bill</span>
-          <span className={arrow}>→</span>
-        </Link>
+      <h1 className="text-2xl font-semibold">City of Martindale</h1>
 
-        <Link href="/services/report" className={card}>
-          <span>Report an Issue</span>
-          <span className={arrow}>→</span>
-        </Link>
+      {/* EVENTS */}
+      <Section title="This Week">
+        <div className="rounded-xl border bg-white shadow-sm p-4 col-span-full">
+          <LocalCalendar />
+        </div>
+      </Section>
 
-        <Link href="/government/council" className={card}>
-          <span>City Council</span>
-          <span className={arrow}>→</span>
-        </Link>
+      {/* MEETING RECORDINGS */}
+      <section className="space-y-3">
+        <h2 className="text-xs font-semibold uppercase text-slate-500">
+          Latest City Meeting
+        </h2>
 
-        <Link href="/forms" className={card}>
-          <span>Forms & Documents</span>
-          <span className={arrow}>→</span>
-        </Link>
+        <div className="rounded-xl overflow-hidden border shadow-sm bg-white">
+          <iframe
+            className="w-full aspect-video"
+            src="https://www.youtube.com/embed/videoseries?list=UUTzqMkR23XbeorS__nD_mVw"
+            title="City of Martindale Meeting Recordings"
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerPolicy="strict-origin-when-cross-origin"
+            allowFullScreen
+          />
+        </div>
 
-        <Link href="/community" className={card}>
-          <span>Community Info</span>
-          <span className={arrow}>→</span>
-        </Link>
-
-        {/* primary action (only place brand shows) */}
-        <Link
-          href="/meetings"
-          className="
-            group
-            flex items-center justify-between
-            rounded-xl
-            bg-brand
-            text-white
-            px-6 py-5
-            font-semibold
-            shadow-card
-            hover:brightness-110
-            active:scale-[0.98]
-            transition
-          "
+        <a
+          href="https://youtube.com/@cityofmartindale-youtubech5986"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sm text-blue-600 underline"
         >
-          <span>Meetings & Media</span>
-          <span>→</span>
-        </Link>
+          Open full YouTube channel →
+        </a>
+      </section>
 
-      </div>
     </main>
   );
 }

@@ -2,24 +2,24 @@
   "name": "martindale-app",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3001",
     "build": "next build",
-    "start": "next start"
+    "start": "next start -p 3001"
   },
   "dependencies": {
+    "clsx": "^2.1.1",
     "next": "^16.1.6",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "clsx": "^2.1.1",
     "tailwind-merge": "^2.6.0"
   },
   "devDependencies": {
-    "typescript": "^5",
-    "tailwindcss": "^3.4.16",
-    "postcss": "^8",
-    "autoprefixer": "^10.4.20",
     "@types/node": "^22",
     "@types/react": "19",
-    "@types/react-dom": "19"
+    "@types/react-dom": "19",
+    "autoprefixer": "^10.4.24",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.19",
+    "typescript": "^5"
   }
 }
