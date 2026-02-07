@@ -28,7 +28,7 @@ function formatLabel(d: string) {
 export default function LocalCalendar() {
   const today = new Date();
 
-  /* ================= WEEK GROUPING ================= */
+  /* ================= WEEK ================= */
 
   const weekStart = startOfWeek(today);
   const weekEnd = new Date(weekStart);
@@ -65,17 +65,14 @@ export default function LocalCalendar() {
   return (
     <div className="space-y-8">
 
-      {/* ================= THIS WEEK CONTENT ONLY ================= */}
+      {/* ================= THIS WEEK ================= */}
       <div className="space-y-2">
         {thisWeek.length === 0 && (
           <p className="text-sm text-slate-400">No events</p>
         )}
 
         {thisWeek.map((e) => (
-          <div
-            key={e.date + e.title}
-            className="rounded-lg border p-3 bg-white"
-          >
+          <div key={e.date + e.title} className="rounded-lg border p-3 bg-white">
             <p className="text-xs text-slate-500">{formatLabel(e.date)}</p>
             <p className="font-medium">{e.title}</p>
             {e.time && (
@@ -85,17 +82,12 @@ export default function LocalCalendar() {
         ))}
       </div>
 
-      {/* ================= MONTH ================= */}
-
-      {/* MOBILE LIST */}
+      {/* ================= MOBILE LIST ================= */}
       <div className="md:hidden space-y-2">
         {days
           .filter((d) => getEventsForDay(d).length > 0)
           .map((day) => (
-            <div
-              key={day.toISOString()}
-              className="rounded-lg border p-3 bg-white"
-            >
+            <div key={day.toISOString()} className="rounded-lg border p-3 bg-white">
               <div className="text-xs text-slate-500 mb-1">
                 {day.toLocaleDateString(undefined, {
                   weekday: "short",
@@ -107,15 +99,17 @@ export default function LocalCalendar() {
               {getEventsForDay(day).map((e) => (
                 <div key={e.title} className="text-sm">
                   • {e.title}
+                  {e.time && (
+                    <span className="text-slate-500 ml-2">({e.time})</span>
+                  )}
                 </div>
               ))}
             </div>
           ))}
       </div>
 
-      {/* DESKTOP GRID */}
+      {/* ================= DESKTOP GRID ================= */}
       <div className="hidden md:block">
-
         <div className="grid grid-cols-7 text-xs text-center text-slate-500 mb-2">
           {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map((d) => (
             <div key={d}>{d}</div>
@@ -132,29 +126,26 @@ export default function LocalCalendar() {
                 key={day.toISOString()}
                 className={`
                   min-h-[110px]
-                  rounded-lg
-                  border
-                  p-2
-                  text-left
-                  text-xs
+                  rounded-lg border p-2 text-left text-xs
                   ${inMonth ? "bg-white" : "bg-slate-50 text-slate-300"}
                 `}
               >
-                <div className="font-medium mb-1">
-                  {formatDay(day)}
-                </div>
+                <div className="font-medium mb-1">{formatDay(day)}</div>
 
                 {dayEvents.map((e) => (
                   <div key={e.title} className="truncate text-[11px]">
                     • {e.title}
+                    {e.time && (
+                      <span className="text-slate-500 ml-1">({e.time})</span>
+                    )}
                   </div>
                 ))}
               </div>
             );
           })}
         </div>
-
       </div>
+
     </div>
   );
 }
