@@ -1,9 +1,0 @@
-import PlayerLandingPage from "@/components/PlayerLandingPage";
-
-export default function Home() {
-  return (
-    <div className="space-y-10">
-      <PlayerLandingPage />
-    </div>
-  );
-}

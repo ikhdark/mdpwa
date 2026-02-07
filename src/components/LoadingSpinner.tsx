@@ -1,10 +1,7 @@
-export default function LoadingSpinner() {
+export default function Loading() {
   return (
-    <div className="flex flex-col items-center justify-center py-24 text-center">
-      <div className="text-lg font-semibold">Loading matchup…</div>
-      <div className="text-sm text-gray-500 mt-2">
-        Fetching data, please wait a moment.
-      </div>
+    <div className="flex justify-center py-16">
+      <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#1f4f3a] border-t-transparent" />
     </div>
   );
 }

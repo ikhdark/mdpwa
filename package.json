@@ -1,34 +1,25 @@
 {
-  "name": "free-nextadmin-nextjs",
-  "version": "1.2.2",
+  "name": "martindale-app",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "start": "next start"
   },
   "dependencies": {
-    "@next/third-parties": "^16.1.4",
-    "clsx": "^2.1.1",
-    "i18n-iso-countries": "^7.14.0",
     "next": "^16.1.6",
-    "next-themes": "^0.4.4",
-    "nextjs-toploader": "^3.7.15",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "clsx": "^2.1.1",
     "tailwind-merge": "^2.6.0"
   },
   "devDependencies": {
-    "@types/node": "^22",
-    "@types/react": "19.0.8",
-    "@types/react-dom": "19.0.3",
-    "autoprefixer": "^10.4.20",
-    "knip": "^5.83.0",
-    "postcss": "^8",
-    "prettier": "^3.4.2",
-    "prettier-plugin-tailwindcss": "^0.6.11",
+    "typescript": "^5",
     "tailwindcss": "^3.4.16",
-    "typescript": "^5"
+    "postcss": "^8",
+    "autoprefixer": "^10.4.20",
+    "@types/node": "^22",
+    "@types/react": "19",
+    "@types/react-dom": "19"
   }
 }

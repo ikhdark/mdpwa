@@ -1,16 +1,7 @@
-import * as Icons from "../icons";
-import type { ComponentType } from "react";
-
-/* ================= TYPES ================= */
-
 type NavItem = {
   title: string;
-  icon?: ComponentType<any>;
   path: string;
   as: "link";
-  global?: boolean;
-  disabled?: boolean;
-  items?: NavItem[]; // nested items
 };
 
 type NavGroup = {
@@ -18,98 +9,43 @@ type NavGroup = {
   items: NavItem[];
 };
 
-/* ================= DATA ================= */
-
 export const NAV_DATA: NavGroup[] = [
-  /* =====================================================
-     GLOBAL / NON-PLAYER PAGES
-  ===================================================== */
-
   {
-    label: "MAIN MENU",
+    label: "MAIN",
     items: [
-      {
-        title: "Player Search",
-        icon: Icons.HomeIcon,
-        path: "", // "/" handled in Sidebar
-        as: "link",
-      },
-      {
-        title: "Matchup",
-        icon: Icons.HomeIcon,
-        path: "matchup",
-        as: "link",
-        global: true,
-      },
+      { title: "Home", path: "", as: "link" },
     ],
   },
 
-  /* =====================================================
-     PLAYER PAGES
-  ===================================================== */
+  {
+    label: "SERVICES",
+    items: [
+      { title: "Pay Utility Bill", path: "services", as: "link" },
+      { title: "Report an Issue", path: "report", as: "link" },
+    ],
+  },
 
   {
-    label: "PLAYER PAGES",
+    label: "GOVERNMENT",
     items: [
-      {
-        title: "Summary",
-        icon: Icons.HomeIcon,
-        path: "summary",
-        as: "link",
-      },
-      {
-        title: "Performance",
-        icon: Icons.HomeIcon,
-        path: "performance",
-        as: "link",
-      },
-      {
-        title: "Time Consistency",
-        icon: Icons.HomeIcon,
-        path: "consistency",
-        as: "link",
-      },
-      {
-        title: "Hero Stats",
-        icon: Icons.HomeIcon,
-        path: "heroes",
-        as: "link",
-      },
-      {
-        title: "Map Stats",
-        icon: Icons.HomeIcon,
-        path: "maps",
-        as: "link",
-      },
-      {
-        title: "Vs Country",
-        icon: Icons.HomeIcon,
-        path: "vs-country",
-        as: "link",
-      },
-      {
-        title: "Vs Player",
-        icon: Icons.HomeIcon,
-        path: "vs-player",
-        as: "link",
-      },
+      { title: "City Council", path: "council", as: "link" },
+      { title: "Directory", path: "directory", as: "link" },
+    ],
+  },
 
-      /* ---------- SoS Ladder ---------- */
+  {
+    label: "FORMS",
+    items: [
+      { title: "Forms & Documents", path: "forms", as: "link" },
+      { title: "Permits", path: "permits", as: "link" },
+    ],
+  },
 
-      {
-        title: "SoS Ladder",
-        icon: Icons.HomeIcon,
-        path: "ladder",
-        as: "link",
-        items: [
-          { title: "Global", path: "ladder", as: "link" },
-          { title: "Random", path: "ladder/race/random", as: "link" },
-          { title: "Undead", path: "ladder/race/undead", as: "link" },
-          { title: "Orc", path: "ladder/race/orc", as: "link" },
-          { title: "Human", path: "ladder/race/human", as: "link" },
-          { title: "Night Elf", path: "ladder/race/elf", as: "link" },
-        ],
-      },
+  {
+    label: "COMMUNITY",
+    items: [
+      { title: "Community Info", path: "community", as: "link" },
+      { title: "Meetings & Media", path: "media", as: "link" },
     ],
   },
 ];

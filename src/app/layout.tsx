@@ -1,72 +1,65 @@
 import "@/css/satoshi.css";
 import "@/css/style.css";
 
-import { GoogleAnalytics } from "@next/third-parties/google";
-import Script from "next/script";
 import Sidebar from "@/components/Layouts/sidebar";
-import Analytics from "@/components/Analytics";
 import { Header } from "@/components/Layouts/header";
+
+import BottomNav from "@/components/BottomNav";
+import InstallBanner from "@/components/InstallBanner";
+import PWARegister from "./pwa-register";
+
 import type { Metadata } from "next";
-import NextTopLoader from "nextjs-toploader";
 import type { PropsWithChildren } from "react";
 import { Providers } from "./providers";
 
-
 export const metadata: Metadata = {
   title: {
-    template: "%s | W3C Stats",
-    default: "W3C Stats",
+    template: "%s | City of Martindale",
+    default: "City of Martindale",
   },
-  description: "Warcraft III W3Champions stats dashboard",
-  openGraph: {
-    title: "W3C Stats",
-    siteName: "W3C Stats",
-  },
-  twitter: {
-    title: "W3C Stats",
-    card: "summary",
-  },
+  description: "Official city services and information portal",
 };
 
 export default function RootLayout({ children }: PropsWithChildren) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1, viewport-fit=cover"
-        />
-      </head>
+      <body className="bg-surface-50 font-sans antialiased">
 
-      <body>
         <Providers>
-          <Analytics />
 
-          <NextTopLoader color="#5750F1" showSpinner={false} />
+          {/* register service worker (offline support) */}
+          <PWARegister />
+
+          {/* install banner (PWA prompt) */}
+          <InstallBanner />
 
           <div className="flex min-h-screen">
+
+            {/* ================= DESKTOP SIDEBAR ================= */}
             <Sidebar />
 
-            <div className="w-full bg-gray-2 dark:bg-[#020d1a]">
+            {/* ================= MAIN COLUMN ================= */}
+            <div className="flex w-full flex-col">
+
               <Header />
 
-              <main className="mx-auto w-full max-w-screen-2xl p-4 md:p-6 2xl:p-10 pb-safe">
+              {/*
+                IMPORTANT:
+                pb-20 -> space for mobile bottom nav
+                pb-safe -> iOS notch safe area
+              */}
+              <main className="flex-1 mx-auto w-full max-w-screen-2xl p-4 md:p-6 2xl:p-10 pb-20 pb-safe">
                 {children}
               </main>
+
             </div>
           </div>
+
+          {/* ================= MOBILE BOTTOM NAV ================= */}
+          <BottomNav />
+
         </Providers>
 
-        {/* Google Analytics */}
-        <GoogleAnalytics gaId="G-5QB5E0KBCL" />
-
-        {/* Plausible */}
-        <Script
-          defer
-          data-domain="w3cstats.com"
-          src="https://plausible.io/js/script.js"
-          strategy="afterInteractive"
-        />
       </body>
     </html>
   );

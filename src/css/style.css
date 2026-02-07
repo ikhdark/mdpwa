@@ -2,73 +2,42 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ================================
-   BASE
-================================ */
+
+/* =========================
+   Base
+========================= */
+
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
   }
 
   body {
-    @apply bg-gray-2 text-dark-5 font-sans
-           dark:bg-[#020D1A] dark:text-dark-6;
-
+    @apply bg-slate-100 text-slate-900 font-sans;
     overscroll-behavior-y: none;
   }
 
-  /* Prevent input zoom on iOS */
+  /* Prevent iOS zoom on inputs */
   input,
   select,
   textarea {
     font-size: 16px;
   }
 
-  /* Better tap behavior */
+  /* Better tap response */
   button,
   a {
     touch-action: manipulation;
   }
 }
 
-/* ================================
-   UTILITIES
-================================ */
+
+/* =========================
+   Utilities
+========================= */
+
 @layer utilities {
-  /* Hide scrollbar */
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-
-  /* Custom scrollbar */
-  .custom-scrollbar {
-    overflow: auto;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    border-radius: 9999px;
-    background: rgb(229 229 229 / 0.4);
-  }
-
-  .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: var(--color-stroke-dark);
-  }
-
-  /* Safe area for iPhone notch */
+  /* iPhone safe area */
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom);
   }
