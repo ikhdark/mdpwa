@@ -31,8 +31,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: PropsWithChildren) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="bg-surface-50 font-sans antialiased">
-        {/* Google Analytics base tag */}
+
+      {/* 🔥 MOVE GA INTO HEAD */}
+      <head>
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-1QQKTE3RYJ"
           strategy="afterInteractive"
@@ -45,26 +46,26 @@ export default function RootLayout({ children }: PropsWithChildren) {
             gtag('config', 'G-1QQKTE3RYJ');
           `}
         </Script>
+      </head>
+
+      <body className="bg-surface-50 font-sans antialiased">
 
         <Providers>
-          {/* Route-change pageview tracking */}
           <Analytics />
-
           <PWARegister />
           <InstallBanner />
 
           <div className="flex min-h-screen">
             <Sidebar />
-
             <div className="flex w-full flex-col">
               <Header />
-
               <main className="flex-1 w-full p-4 md:p-6 pb-20 pb-safe">
                 {children}
               </main>
             </div>
           </div>
         </Providers>
+
       </body>
     </html>
   );
