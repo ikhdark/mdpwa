@@ -8,16 +8,17 @@ import type { PropsWithChildren } from "react";
 import { Providers } from "./providers";
 import Analytics from "@/components/Analytics";
 import InstallBanner from "@/components/InstallBanner";
+import IosInstallBanner from "@/components/IosInstallBanner";
 import PWARegister from "./pwa-register";
 import Script from "next/script";
 
 import { Header } from "@/components/Layouts/header";
 
-/* ✅ Sidebar (CRITICAL) */
+/* Sidebar */
 import Sidebar from "@/components/Layouts/sidebar";
 import { SidebarProvider } from "@/components/Layouts/sidebar/sidebar-context";
 
-/* ✅ Google Font */
+/* Google Font */
 import { Public_Sans } from "next/font/google";
 
 const publicSans = Public_Sans({
@@ -48,16 +49,15 @@ export default function RootLayout({ children }: PropsWithChildren) {
         <Providers>
           <Analytics />
           <PWARegister />
-          <InstallBanner />
 
-          {/* 🔴 THIS WAS MISSING */}
+          {/* Banners */}
+          <InstallBanner />
+          <IosInstallBanner />
+
           <SidebarProvider>
             <div className="flex min-h-screen">
-
-              {/* actual sidebar */}
               <Sidebar />
 
-              {/* page area */}
               <div className="flex flex-1 flex-col">
                 <Header />
 
@@ -65,10 +65,8 @@ export default function RootLayout({ children }: PropsWithChildren) {
                   {children}
                 </main>
               </div>
-
             </div>
           </SidebarProvider>
-
         </Providers>
       </body>
     </html>
