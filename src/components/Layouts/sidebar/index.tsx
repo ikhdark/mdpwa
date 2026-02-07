@@ -23,7 +23,7 @@ export default function Sidebar() {
         className={`
           fixed md:static
           left-0 top-0 z-50
-          w-72 h-screen
+          w-72 h-dvh
           bg-white
           border-r border-slate-200
           overflow-y-auto
