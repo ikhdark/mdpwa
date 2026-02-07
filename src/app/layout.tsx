@@ -31,11 +31,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: PropsWithChildren) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <body className="bg-surface-50 font-sans antialiased">
 
-      {/* 🔥 MOVE GA INTO HEAD */}
-      <head>
+        {/* ✅ Google Analytics — correct placement */}
         <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-1QQKTE3RYJ"
+          src="https://www.googletagmanager.com/gtag/js?id=G-1QQKTE3RY3"
           strategy="afterInteractive"
         />
         <Script id="ga-init" strategy="afterInteractive">
@@ -43,12 +43,9 @@ export default function RootLayout({ children }: PropsWithChildren) {
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', 'G-1QQKTE3RYJ');
+            gtag('config', 'G-1QQKTE3RY3');
           `}
         </Script>
-      </head>
-
-      <body className="bg-surface-50 font-sans antialiased">
 
         <Providers>
           <Analytics />
@@ -57,6 +54,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
 
           <div className="flex min-h-screen">
             <Sidebar />
+
             <div className="flex w-full flex-col">
               <Header />
               <main className="flex-1 w-full p-4 md:p-6 pb-20 pb-safe">
