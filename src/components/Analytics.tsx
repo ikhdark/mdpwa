@@ -1,27 +1,22 @@
 "use client";
 
-import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
-declare global {
-  interface Window {
-    gtag?: (...args: any[]) => void;
-  }
-}
-
 export default function Analytics() {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-
   useEffect(() => {
-    if (!window.gtag) return;
+    const track = () => {
+      (window as any).dataLayer?.push({
+        event: "page_view",
+        page_path: window.location.pathname + window.location.search,
+      });
+    };
 
-    const url = pathname + (searchParams?.toString() ? `?${searchParams}` : "");
+    track();
 
-    window.gtag("config", "G-1QQKTE3RYJ", {
-      page_path: url,
-    });
-  }, [pathname, searchParams]);
+    window.addEventListener("popstate", track);
+
+    return () => window.removeEventListener("popstate", track);
+  }, []);
 
   return null;
 }
