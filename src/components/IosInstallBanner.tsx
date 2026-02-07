@@ -86,7 +86,7 @@ export default function IosInstallBanner() {
               <li>
                 <span className="font-semibold">1.</span> Tap the{" "}
                 <span className="font-semibold">Share</span> button
-                (the square with the <span className="font-bold">↑</span> arrow).
+                (the square in the bottom middle with the <span className="font-bold">↑</span> arrow).
               </li>
               <li>
                 <span className="font-semibold">2.</span> Scroll down.
