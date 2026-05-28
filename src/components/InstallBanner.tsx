@@ -42,7 +42,7 @@ export default function InstallBanner() {
     const prompt = deferredPrompt.current;
     if (!prompt) return;
 
-    prompt.prompt();
+    await prompt.prompt();
     await prompt.userChoice;
 
     deferredPrompt.current = null;
@@ -55,7 +55,9 @@ export default function InstallBanner() {
     <div className="fixed bottom-16 left-1/2 z-50 flex -translate-x-1/2 items-center gap-3">
       {/* INSTALL BUTTON */}
       <button
-        onClick={install}
+        onClick={() => {
+          void install();
+        }}
         className="text-md rounded-2xl bg-brand px-7 py-4 font-semibold text-white shadow-lg transition hover:scale-100 hover:bg-brand-dark hover:shadow-xl active:scale-95"
       >
         Tap to Install App
@@ -63,7 +65,9 @@ export default function InstallBanner() {
 
       {/* SMALL CLOSE BUTTON */}
       <button
-        onClick={() => setVisible(false)}
+        onClick={() => {
+          setVisible(false);
+        }}
         className="rounded-xl bg-gray-300 px-3 py-2 text-sm font-medium text-gray-800 transition hover:bg-gray-400"
       >
         Close

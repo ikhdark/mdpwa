@@ -3,8 +3,9 @@ import "@/css/satoshi.css";
 
 import type { Metadata } from "next";
 import type { PropsWithChildren } from "react";
+import { Analytics } from "@vercel/analytics/next";
 
-import Analytics from "@/components/Analytics";
+import GoogleAnalytics from "@/components/Analytics";
 import InstallBanner from "@/components/InstallBanner";
 import IosInstallBanner from "@/components/IosInstallBanner";
 import PWARegister from "./pwa-register";
@@ -49,6 +50,7 @@ export default function RootLayout({ children }: PropsWithChildren) {
           `}
         </Script>
 
+        <GoogleAnalytics />
         <Analytics />
         <PWARegister />
 

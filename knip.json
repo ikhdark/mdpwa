@@ -1,4 +1,23 @@
 {
-  "entry": ["src/app/**/*.{ts,tsx}"],
-  "project": ["src/**/*.{ts,tsx}"]
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "treatConfigHintsAsErrors": true,
+  "exclude": ["exports", "types"],
+  "entry": [
+    "src/app/**/*.{ts,tsx}",
+    "src/**/*.test.{ts,tsx}",
+    "scripts/**/*.{js,mjs,cjs}",
+    "*.config.{js,ts,mjs,cjs}",
+    "eslint*.mjs"
+  ],
+  "project": [
+    "src/**/*.{ts,tsx}",
+    "scripts/**/*.{js,mjs,cjs}",
+    "*.{js,ts,mjs,cjs}",
+    "*.config.{js,ts,mjs,cjs}",
+    "!**/*.d.ts",
+    "!**/.next/**",
+    "!**/node_modules/**",
+    "!**/dist/**",
+    "!**/out/**"
+  ]
 }

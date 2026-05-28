@@ -1,0 +1,4 @@
+interface:
+  display_name: "Martindale Implement"
+  short_description: "Implement and verify Martindale PWA changes"
+  default_prompt: "Use $martindale-implement to make and verify a Martindale PWA change."

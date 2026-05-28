@@ -32,8 +32,11 @@ export default function Sidebar() {
 
               <div className="mt-2 space-y-1">
                 {group.items.map((item) => {
-                  const href: string = item.url || `/${item.path || ""}`;
-                  const active = !!item.path && pathname === href;
+                  const href: string = item.url ?? `/${item.path ?? ""}`;
+                  const active =
+                    item.path !== undefined &&
+                    item.path.length > 0 &&
+                    pathname === href;
 
                   return (
                     <MenuItem

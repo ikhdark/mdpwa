@@ -4,6 +4,9 @@ node_modules/
 out/
 dist/
 *.tsbuildinfo
+.eslintcache
+.eslintcache-fast
+.knipcache
 
 # Environment
 .env
@@ -25,3 +28,8 @@ Thumbs.db
 # Local agent/tooling artifacts
 .playwright-cli/
 .serena/
+
+# Project Codex skills are intentional repo documentation.
+!.codex/
+!.codex/skills/
+!.codex/skills/**

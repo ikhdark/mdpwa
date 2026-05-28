@@ -12,6 +12,10 @@ function formatDay(d: Date) {
   return d.getDate();
 }
 
+function hasText(value: string | undefined) {
+  return value !== undefined && value.length > 0;
+}
+
 export default function LocalCalendar() {
   const today = new Date();
 
@@ -66,8 +70,10 @@ export default function LocalCalendar() {
               {formatLocalDateLabel(e.date)}
             </p>
             <p className="font-medium">{e.title}</p>
-            {e.time && <p className="text-sm text-slate-600">{e.time}</p>}
-            {e.location && (
+            {hasText(e.time) && (
+              <p className="text-sm text-slate-600">{e.time}</p>
+            )}
+            {hasText(e.location) && (
               <p className="text-sm text-slate-500">{e.location}</p>
             )}
           </div>
@@ -94,7 +100,7 @@ export default function LocalCalendar() {
               {getEventsForDay(day).map((e) => (
                 <div key={`${e.date}-${e.title}`} className="text-sm">
                   • {e.title}
-                  {e.time && (
+                  {hasText(e.time) && (
                     <span className="ml-2 text-slate-500">({e.time})</span>
                   )}
                 </div>
@@ -129,7 +135,7 @@ export default function LocalCalendar() {
                     className="truncate text-[11px]"
                   >
                     • {e.title}
-                    {e.time && (
+                    {hasText(e.time) && (
                       <span className="ml-1 text-slate-500">({e.time})</span>
                     )}
                   </div>

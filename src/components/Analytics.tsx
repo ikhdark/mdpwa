@@ -14,12 +14,12 @@ export default function Analytics() {
     const track = () => {
       const pagePath = window.location.pathname + window.location.search;
 
-      if (window.gtag) {
+      if (window.gtag !== undefined) {
         window.gtag("event", "page_view", { page_path: pagePath });
         return;
       }
 
-      window.dataLayer = window.dataLayer || [];
+      window.dataLayer = window.dataLayer ?? [];
       window.dataLayer.push({ event: "page_view", page_path: pagePath });
     };
 
@@ -27,7 +27,9 @@ export default function Analytics() {
 
     window.addEventListener("popstate", track);
 
-    return () => window.removeEventListener("popstate", track);
+    return () => {
+      window.removeEventListener("popstate", track);
+    };
   }, []);
 
   return null;

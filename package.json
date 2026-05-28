@@ -1,37 +1,59 @@
 {
   "name": "martindale-app",
   "private": true,
+  "packageManager": "pnpm@11.1.3",
+  "type": "module",
+  "engines": {
+    "node": "24.x",
+    "pnpm": ">=11.1.3"
+  },
   "scripts": {
     "dev": "next dev -p 3002",
+    "dev:webpack": "next dev --webpack -p 3002",
     "build": "next build",
-    "typecheck": "tsc --noEmit",
-    "knip": "knip",
+    "start": "next start -p 3002",
+    "lint": "eslint . --cache --cache-strategy content --cache-location .eslintcache",
+    "lint:fix": "eslint . --fix --cache --cache-strategy content --cache-location .eslintcache",
+    "lint:fast": "eslint . --config eslint.fast.config.mjs --cache --cache-strategy content --cache-location .eslintcache-fast",
+    "lint:fast:fix": "eslint . --config eslint.fast.config.mjs --fix --cache --cache-strategy content --cache-location .eslintcache-fast",
+    "lint:oxlint": "oxlint .",
+    "lint:oxlint:fix": "oxlint . --fix",
+    "typecheck": "next typegen && tsc --noEmit",
+    "knip": "knip --cache --cache-location .knipcache",
     "test": "vitest run",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "start": "next start -p 3002"
+    "format": "prettier --write . --cache --cache-strategy content",
+    "format:check": "prettier --check . --cache --cache-strategy content",
+    "verify:fast": "pnpm lint:fast && pnpm typecheck",
+    "verify:full": "pnpm lint && pnpm typecheck && pnpm test && pnpm knip && pnpm run format:check && pnpm build",
+    "tools": "node scripts/dev-toolbox.mjs",
+    "clean": "node -e \"import('node:fs').then(({ rmSync }) => rmSync('.next', { recursive: true, force: true }))\""
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "clsx": "^2.1.1",
     "next": "^16.2.6",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
-    "tailwind-merge": "^2.6.1"
+    "tailwind-merge": "^3.6.0"
   },
   "devDependencies": {
+    "@eslint/compat": "^2.1.0",
     "@types/node": "^24.12.4",
     "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
     "autoprefixer": "^10.5.0",
+    "eslint": "^9.39.4",
+    "eslint-config-next": "^16.2.6",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.6.0",
     "knip": "^6.14.2",
+    "oxlint": "1.65.0",
     "postcss": "^8.5.15",
     "prettier": "^3.8.3",
     "prettier-plugin-tailwindcss": "^0.8.0",
     "tailwindcss": "^3.4.19",
     "typescript": "^5.9.3",
+    "typescript-eslint": "^8.59.4",
     "vitest": "^4.1.7"
-  },
-  "overrides": {
-    "postcss": "^8.5.15"
   }
 }

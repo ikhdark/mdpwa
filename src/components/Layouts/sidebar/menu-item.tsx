@@ -29,7 +29,7 @@ export default function MenuItem({
     className,
   );
 
-  if (!href) {
+  if (href === undefined || href.length === 0) {
     return (
       <button type="button" onClick={onClick} className={classes}>
         {children}

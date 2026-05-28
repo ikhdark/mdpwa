@@ -1,19 +1,7 @@
 "use client";
 
 import LocalCalendar from "@/components/LocalCalendar";
-import Link from "next/link";
 import { useSidebarContext } from "@/components/Layouts/sidebar/sidebar-context";
-
-function Card({ href, children }: { href: string; children: React.ReactNode }) {
-  return (
-    <Link
-      href={href}
-      className="block rounded-xl border bg-white px-5 py-4 font-medium shadow-sm transition hover:shadow-md"
-    >
-      {children}
-    </Link>
-  );
-}
 
 function Section({
   title,

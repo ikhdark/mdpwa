@@ -1,9 +1,13 @@
 .next/
 .serena/
+.eslintcache
+.eslintcache-fast
+.knipcache
 node_modules/
 out/
 dist/
 coverage/
+pnpm-lock.yaml
 public/**/*.png
 public/**/*.jpg
 public/**/*.ico

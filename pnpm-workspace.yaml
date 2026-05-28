@@ -1,0 +1,21 @@
+packages:
+  - "."
+
+engineStrict: true
+preferFrozenLockfile: true
+preferOffline: true
+
+supportedArchitectures:
+  os:
+    - win32
+  cpu:
+    - x64
+
+overrides:
+  postcss: ^8.5.15
+
+allowBuilds:
+  esbuild: true
+  oxlint: true
+  sharp: true
+  unrs-resolver: true

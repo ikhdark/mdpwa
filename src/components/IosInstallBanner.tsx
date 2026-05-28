@@ -1,22 +1,24 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+
+function shouldShowIosInstallBanner() {
+  if (typeof navigator === "undefined") {
+    return false;
+  }
+
+  const ua = navigator.userAgent;
+  const isIOS = /iPhone|iPad|iPod/.test(ua);
+  const isStandalone =
+    (navigator as Navigator & { standalone?: boolean }).standalone === true;
+  const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
+
+  return isIOS && isSafari && !isStandalone;
+}
 
 export default function IosInstallBanner() {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(shouldShowIosInstallBanner);
   const [showGuide, setShowGuide] = useState(false);
-
-  useEffect(() => {
-    const ua = navigator.userAgent;
-    const isIOS = /iPhone|iPad|iPod/.test(ua);
-    const isStandalone =
-      (navigator as Navigator & { standalone?: boolean }).standalone === true;
-    const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
-
-    if (isIOS && isSafari && !isStandalone) {
-      setVisible(true);
-    }
-  }, []);
 
   if (!visible) return null;
 
@@ -30,7 +32,9 @@ export default function IosInstallBanner() {
 
         {/* Show guide */}
         <button
-          onClick={() => setShowGuide(true)}
+          onClick={() => {
+            setShowGuide(true);
+          }}
           className="rounded-lg bg-brand px-3 py-2 text-xs font-semibold text-white transition hover:bg-brand-dark"
         >
           Show Me How
@@ -38,7 +42,9 @@ export default function IosInstallBanner() {
 
         {/* Close banner */}
         <button
-          onClick={() => setVisible(false)}
+          onClick={() => {
+            setVisible(false);
+          }}
           className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-200 text-sm font-bold transition hover:bg-slate-300"
         >
           ✕
@@ -69,7 +75,9 @@ export default function IosInstallBanner() {
             </ol>
 
             <button
-              onClick={() => setShowGuide(false)}
+              onClick={() => {
+                setShowGuide(false);
+              }}
               className="w-full rounded-xl bg-brand py-2 text-sm font-semibold text-white transition hover:bg-brand-dark"
             >
               Got It
