@@ -1,0 +1,10 @@
+.next/
+.serena/
+node_modules/
+out/
+dist/
+coverage/
+public/**/*.png
+public/**/*.jpg
+public/**/*.ico
+src/fonts/
